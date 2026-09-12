@@ -1,6 +1,9 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import { AuthProvider } from "./context/AuthContext";
+import { ThemeProvider } from "./context/ThemeContext";
+import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
 
 import Home from "./pages/Home";
@@ -12,18 +15,46 @@ import ComplaintDetails from "./pages/ComplaintDetails";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Navbar />
+    <ThemeProvider>
+      <AuthProvider>
+        <BrowserRouter>
+          <Navbar />
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/report" element={<ReportComplaint />} />
-        <Route path="/complaints" element={<MyComplaints />} />
-        <Route path="/complaints/:id" element={<ComplaintDetails />} />
-      </Routes>
-    </BrowserRouter>
+        <Routes>
+          {/* Public routes */}
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
+          {/* Protected routes — require login */}
+          <Route
+            path="/report"
+            element={
+              <ProtectedRoute>
+                <ReportComplaint />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/complaints"
+            element={
+              <ProtectedRoute>
+                <MyComplaints />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/complaints/:id"
+            element={
+              <ProtectedRoute>
+                <ComplaintDetails />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
+  </ThemeProvider>
   );
 }
 
