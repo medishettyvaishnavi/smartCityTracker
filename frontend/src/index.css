@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* ── Global CSS Custom Properties for White + Pastel Magenta Theme ── */
+:root,
+[data-theme="light"] {
+  --theme-name: 'light';
+
+  /* Backgrounds: Pure White + Soft Pastel Blush/Magenta */
+  --bg-page: #fdf7fa;
+  --bg-surface: #ffffff;
+  --bg-surface-alt: #faf0f5;
+  --bg-surface-elevated: #ffffff;
+  --bg-surface-translucent: rgba(255, 255, 255, 0.92);
+
+  /* Borders: Soft Pastel Magenta & White Tint */
+  --border-color: #f0dbe7;
+  --border-subtle: rgba(192, 77, 132, 0.12);
+  --border-strong: #e5bfd4;
+
+  /* Typography */
+  --text-primary: #2b1723;
+  --text-secondary: #6b4d5e;
+  --text-muted: #9c7f90;
+  --text-inverse: #ffffff;
+
+  /* Pastel Magenta Primary Tone */
+  --pastel-accent: #c04d84;
+  --pastel-accent-hover: #a83a71;
+  --pastel-accent-active: #8e2b5d;
+  --pastel-accent-soft: #fceef5;
+  --pastel-accent-border: #f0bcd8;
+  --pastel-accent-text: #962862;
+  --pastel-accent-glow: rgba(192, 77, 132, 0.16);
+
+  /* Status Colors (Muted Pastels with Magenta Alignment) */
+  --status-resolved-bg: #eff8f3;
+  --status-resolved-text: #2c6840;
+  --status-resolved-border: #c9e8d4;
+
+  --status-inprogress-bg: #fdf7ed;
+  --status-inprogress-text: #8c6225;
+  --status-inprogress-border: #f5dfbf;
+
+  --status-pending-bg: #fdf0f5;
+  --status-pending-text: #b33974;
+  --status-pending-border: #f6cde0;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(43, 23, 35, 0.05);
+  --shadow-md: 0 4px 16px rgba(43, 23, 35, 0.07);
+  --shadow-lg: 0 10px 32px rgba(43, 23, 35, 0.09);
+
+  /* Inputs */
+  --input-bg: #ffffff;
+  --input-border: #edd2e2;
+  --input-focus-border: #c04d84;
+  --input-focus-ring: rgba(192, 77, 132, 0.22);
+
+  /* Scrollbar */
+  --scrollbar-thumb: #e2bed2;
+  --scrollbar-track: #fbf0f6;
+}
+
+[data-theme="dark"] {
+  --theme-name: 'dark';
+
+  /* Backgrounds: Deep Plum/Charcoal with Soft White Cards */
+  --bg-page: #171015;
+  --bg-surface: #221720;
+  --bg-surface-alt: #2a1d27;
+  --bg-surface-elevated: #332330;
+  --bg-surface-translucent: rgba(34, 23, 32, 0.9);
+
+  /* Borders */
+  --border-color: #3b2836;
+  --border-subtle: rgba(255, 255, 255, 0.08);
+  --border-strong: #54394e;
+
+  /* Typography */
+  --text-primary: #ffffff;
+  --text-secondary: #dcbed1;
+  --text-muted: #9d8093;
+  --text-inverse: #171015;
+
+  /* Pastel Magenta Primary Tone for Dark Mode */
+  --pastel-accent: #e57eb3;
+  --pastel-accent-hover: #f095c4;
+  --pastel-accent-active: #f7add2;
+  --pastel-accent-soft: rgba(229, 126, 179, 0.16);
+  --pastel-accent-border: rgba(229, 126, 179, 0.32);
+  --pastel-accent-text: #f9cbe3;
+  --pastel-accent-glow: rgba(229, 126, 179, 0.22);
+
+  /* Status Colors */
+  --status-resolved-bg: #15291d;
+  --status-resolved-text: #82cca0;
+  --status-resolved-border: #284c36;
+
+  --status-inprogress-bg: #2b2214;
+  --status-inprogress-text: #d8b26e;
+  --status-inprogress-border: #4f3e23;
+
+  --status-pending-bg: #331724;
+  --status-pending-text: #ea81b6;
+  --status-pending-border: #5e2a44;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.35);
+  --shadow-md: 0 4px 18px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 36px rgba(0, 0, 0, 0.55);
+
+  /* Inputs */
+  --input-bg: #1b1219;
+  --input-border: #422e3c;
+  --input-focus-border: #e57eb3;
+  --input-focus-ring: rgba(229, 126, 179, 0.28);
+
+  /* Scrollbar */
+  --scrollbar-thumb: #473242;
+  --scrollbar-track: #191117;
+}
+
+/* ── Reset & Base Styles ── */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  min-height: 100%;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  transition: background-color 0.25s ease, color 0.25s ease;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--pastel-accent);
+}
+
+/* Selection */
+::selection {
+  background-color: var(--pastel-accent-soft);
+  color: var(--text-primary);
+}
