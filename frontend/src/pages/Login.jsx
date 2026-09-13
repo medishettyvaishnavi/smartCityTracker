@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { Alert, Spinner } from "../components/common";
 import "./Auth.css";
 
 function Login() {
@@ -24,8 +25,7 @@ function Login() {
   const onSubmit = async (data) => {
     setLoginError("");
     setIsSubmitting(true);
-    await new Promise((r) => setTimeout(r, 1000));
-    const result = login(data.email, data.password);
+    const result = await login(data.email, data.password);
     setIsSubmitting(false);
     if (result.success) {
       navigate(from, { replace: true });
@@ -61,7 +61,7 @@ function Login() {
 
         {/* Error banner */}
         {loginError && (
-          <div className="auth-alert">⚠️ {loginError}</div>
+          <Alert type="error" message={loginError} onClose={() => setLoginError("")} />
         )}
 
         <form className="auth-form" onSubmit={handleSubmit(onSubmit)} noValidate>
@@ -129,7 +129,7 @@ function Login() {
 
           {/* Submit */}
           <button type="submit" className="auth-submit-btn" disabled={isSubmitting}>
-            {isSubmitting ? <span className="auth-spinner" /> : "Sign In →"}
+            {isSubmitting ? <Spinner size="sm" color="#fff" /> : "Sign In →"}
           </button>
 
         </form>

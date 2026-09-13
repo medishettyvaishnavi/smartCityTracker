@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { Spinner } from "../components/common";
 import "./Auth.css";
 
 const PERKS = [
@@ -28,10 +29,8 @@ function Register() {
   const password = watch("password", "");
 
   const onSubmit = async (data) => {
-    await new Promise((r) => setTimeout(r, 1300));
-    console.log("Registered:", data);
-    // Auto-login with new account
-    loginWithData(data);
+    // Register and auto-login with new account
+    await loginWithData(data);
     navigate("/complaints", { replace: true });
   };
 
@@ -287,7 +286,7 @@ function Register() {
 
             {/* Submit */}
             <button type="submit" className="auth-submit-btn" disabled={isSubmitting}>
-              {isSubmitting ? <span className="auth-spinner" /> : "Create Account →"}
+              {isSubmitting ? <Spinner size="sm" color="#fff" /> : "Create Account →"}
             </button>
 
           </form>

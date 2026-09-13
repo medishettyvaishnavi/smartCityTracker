@@ -1,0 +1,60 @@
+.sct-alert {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 0.86rem;
+  line-height: 1.4;
+  margin-bottom: 16px;
+  transition: all 0.2s ease;
+}
+
+.sct-alert-icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.sct-alert-content {
+  flex: 1;
+}
+
+.sct-alert-close {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  cursor: pointer;
+  color: inherit;
+  opacity: 0.7;
+  padding: 0 4px;
+  line-height: 1;
+  transition: opacity 0.15s;
+}
+
+.sct-alert-close:hover {
+  opacity: 1;
+}
+
+.sct-alert-error {
+  background: var(--status-pending-bg);
+  color: var(--status-pending-text);
+  border: 1px solid var(--status-pending-border);
+}
+
+.sct-alert-warning {
+  background: var(--status-inprogress-bg);
+  color: var(--status-inprogress-text);
+  border: 1px solid var(--status-inprogress-border);
+}
+
+.sct-alert-success {
+  background: var(--status-resolved-bg);
+  color: var(--status-resolved-text);
+  border: 1px solid var(--status-resolved-border);
+}
+
+.sct-alert-info {
+  background: var(--pastel-accent-soft);
+  color: var(--pastel-accent);
+  border: 1px solid var(--pastel-accent-border);
+}

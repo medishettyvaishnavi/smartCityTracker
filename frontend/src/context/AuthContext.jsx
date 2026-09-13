@@ -1,60 +1,42 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useCallback, useEffect } from "react";
+import authService from "../services/authService";
 
 /* ── Auth Context ─────────────────────────────────────── */
 const AuthContext = createContext(null);
 
-/* Mock user data that gets "returned" on login */
-const MOCK_USER = {
-  name: "Vaishnavi M.",
-  email: "test@smartcity.com",
-  initials: "VM",
-  city: "Bengaluru",
-  joinedAt: "September 2026",
-};
-
 export function AuthProvider({ children }) {
-  // Persist auth across page refreshes via sessionStorage
-  const [user, setUser] = useState(() => {
-    try {
-      const stored = sessionStorage.getItem("sc_user");
-      return stored ? JSON.parse(stored) : null;
-    } catch {
-      return null;
-    }
-  });
+  // Read authenticated user state via authService
+  const [user, setUser] = useState(() => authService.getCurrentUser());
 
-  const login = useCallback((email, password) => {
-    // Mock credential check — swap with real API call later
-    if (email === "test@smartcity.com" && password === "password123") {
-      const userData = { ...MOCK_USER, email };
-      setUser(userData);
-      sessionStorage.setItem("sc_user", JSON.stringify(userData));
+  useEffect(() => {
+    const handleAuthExpired = () => {
+      setUser(null);
+    };
+    window.addEventListener("sct:auth-expired", handleAuthExpired);
+    return () => window.removeEventListener("sct:auth-expired", handleAuthExpired);
+  }, []);
+
+  const login = useCallback(async (email, password) => {
+    const result = await authService.login(email, password);
+    if (result.success) {
+      setUser(result.user);
       return { success: true };
     }
-    return { success: false, message: "Invalid email or password. Try test@smartcity.com / password123" };
+    return { success: false, message: result.message };
   }, []);
 
-  const loginWithData = useCallback((userData) => {
-    // Used after registration
-    const newUser = {
-      name: userData.fullName,
-      email: userData.email,
-      initials: userData.fullName
-        .split(" ")
-        .map((n) => n[0])
-        .join("")
-        .toUpperCase()
-        .slice(0, 2),
-      city: userData.city || "Your City",
-      joinedAt: new Date().toLocaleDateString("en-IN", { month: "long", year: "numeric" }),
-    };
-    setUser(newUser);
-    sessionStorage.setItem("sc_user", JSON.stringify(newUser));
+  const loginWithData = useCallback(async (userData) => {
+    const result = await authService.register(userData);
+    if (result.success) {
+      setUser(result.user);
+      return { success: true };
+    }
+    return { success: false, message: result.message };
   }, []);
 
-  const logout = useCallback(() => {
+  const logout = useCallback(async () => {
+    await authService.logout();
     setUser(null);
-    sessionStorage.removeItem("sc_user");
   }, []);
 
   return (

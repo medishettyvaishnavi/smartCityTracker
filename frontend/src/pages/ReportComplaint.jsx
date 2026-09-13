@@ -1,5 +1,8 @@
 import { useForm } from "react-hook-form";
 import { useState } from "react";
+import { Link } from "react-router-dom";
+import complaintService from "../services/complaintService";
+import { Spinner } from "../components/common";
 import "./ReportComplaint.css";
 
 const CATEGORIES = [
@@ -23,7 +26,7 @@ const PRIORITIES = [
 ];
 
 function ReportComplaint() {
-  const [submitted, setSubmitted] = useState(false);
+  const [createdComplaint, setCreatedComplaint] = useState(null);
   const [selectedPriority, setSelectedPriority] = useState("medium");
   const [charCount, setCharCount] = useState(0);
   const [imagePreview, setImagePreview] = useState(null);
@@ -36,14 +39,17 @@ function ReportComplaint() {
   } = useForm({ defaultValues: { priority: "medium" } });
 
   const onSubmit = async (data) => {
-    await new Promise((res) => setTimeout(res, 1200));
-    console.log("Complaint submitted:", { ...data, priority: selectedPriority });
-    setSubmitted(true);
+    const created = await complaintService.createComplaint({
+      ...data,
+      priority: selectedPriority,
+      imagePreview,
+    });
+    setCreatedComplaint(created);
   };
 
   const handleReset = () => {
     reset();
-    setSubmitted(false);
+    setCreatedComplaint(null);
     setSelectedPriority("medium");
     setCharCount(0);
     setImagePreview(null);
@@ -58,7 +64,7 @@ function ReportComplaint() {
     }
   };
 
-  if (submitted) {
+  if (createdComplaint) {
     return (
       <div className="rc-wrapper">
         <div className="rc-success-card">
@@ -69,11 +75,16 @@ function ReportComplaint() {
             it shortly. Track progress under <strong>My Complaints</strong>.
           </p>
           <div className="rc-success-id">
-            Reference ID: <strong>#SCT-{Date.now().toString().slice(-6)}</strong>
+            Reference ID: <strong>#{createdComplaint.id}</strong>
           </div>
-          <button className="rc-btn rc-btn-primary" onClick={handleReset}>
-            Submit Another Complaint
-          </button>
+          <div style={{ display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap", marginTop: "16px" }}>
+            <Link to={`/complaints/${createdComplaint.id}`} className="rc-btn rc-btn-primary">
+              View Complaint Details →
+            </Link>
+            <button className="rc-btn rc-btn-ghost" onClick={handleReset}>
+              Submit Another Complaint
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -320,7 +331,7 @@ function ReportComplaint() {
               Clear Form
             </button>
             <button type="submit" className="rc-btn rc-btn-primary" disabled={isSubmitting}>
-              {isSubmitting ? <span className="rc-spinner" /> : "Submit Complaint"}
+              {isSubmitting ? <Spinner size="sm" color="#fff" /> : "Submit Complaint"}
             </button>
           </div>
 
