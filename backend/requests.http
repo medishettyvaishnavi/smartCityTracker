@@ -7,3 +7,19 @@ Content-Type: application/json
   "email": "test@example.com",
   "password": "Test12345"
 }
+
+### Login
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "Test12345"
+}
+
+### Protected route
+GET http://localhost:5000/api/protected
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYTY3NDExN2NmM2M3ZWRiZWFkMGFiZiIsInJvbGUiOiJjaXRpemVuIiwiaWF0IjoxNzg5MzE4ODI5LCJleHAiOjE3ODk0MDUyMjl9.0r_plk3k2f8r8Xs8rE2PvKi6f3pwwlSn-cfTYJWQEwQ
+
+### Protected route without token
+GET http://localhost:5000/api/protected
