@@ -5,6 +5,8 @@ import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import complaintRoutes from "./routes/complaintRoutes.js";
 import authMiddleware from "./middleware/authMiddleware.js";
+import adminMiddleware from "./middleware/adminMiddleware.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 dotenv.config();
 
@@ -36,3 +38,17 @@ connectDB();
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+app.get(
+  "/api/admin/test",
+  authMiddleware,
+  adminMiddleware,
+  (req, res) => {
+    res.json({
+      message: "Admin access successful",
+      user: req.user,
+    });
+  }
+);
+
+app.use("/api/admin", adminRoutes);

@@ -85,3 +85,53 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYTk3ZTI5N
 # Replace with a real complaint ID
 DELETE http://localhost:5000/api/complaints/6aa99a191927328b543178fd
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYTk3ZTI5NzEyMTljNTRkZjY5ZTAyYiIsInJvbGUiOiJjaXRpemVuIiwiaWF0IjoxNzg5NDkyOTUwLCJleHAiOjE3ODk1NzkzNTB9.cn6WJYjiAaIMjcaNGG76tET-dTrHMf3mE9WVWTTAN34
+
+###
+GET http://localhost:5000/api/admin/test
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWE5MTk2MDc4NjM2YTkwMzlkMDk3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4OTU3NzMzMywiZXhwIjoxNzg5NjYzNzMzfQ.vPaAEX9CK-I4vRENUDbuEWvgrNQPoASja8idtTOAoFY 
+
+###
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "kanna@gmail.com",
+  "password": "kannakanna"
+}
+
+###
+GET http://localhost:5000/api/admin/complaints
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWE5MTk2MDc4NjM2YTkwMzlkMDk3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4OTU3NzMzMywiZXhwIjoxNzg5NjYzNzMzfQ.vPaAEX9CK-I4vRENUDbuEWvgrNQPoASja8idtTOAoFY 
+
+###
+GET http://localhost:5000/api/admin/complaints
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYTY3NDExN2NmM2M3ZWRiZWFkMGFiZiIsInJvbGUiOiJjaXRpemVuIiwiaWF0IjoxNzg5NTc3OTUxLCJleHAiOjE3ODk2NjQzNTF9.ChixNsjmCpx_HiI9r11IDjjTp7NomZaQykx9NL32vFw
+###
+PUT http://localhost:5000/api/admin/complaints/6aa99ac91927328b543178fe/status
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWE5MTk2MDc4NjM2YTkwMzlkMDk3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4OTU3NzMzMywiZXhwIjoxNzg5NjYzNzMzfQ.vPaAEX9CK-I4vRENUDbuEWvgrNQPoASja8idtTOAoFY
+Content-Type: application/json
+
+{
+    "status": "in-progress"
+}
+###
+PUT http://localhost:5000/api/admin/complaints/6aa99ac91927328b543178fe
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWE5MTk2MDc4NjM2YTkwMzlkMDk3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4OTU3NzMzMywiZXhwIjoxNzg5NjYzNzMzfQ.vPaAEX9CK-I4vRENUDbuEWvgrNQPoASja8idtTOAoFY 
+Content-Type: application/json
+
+{
+  "status": "hello"
+}
+
+###
+PUT http://localhost:5000/api/admin/complaints/6aaa97d301e56e1403251108/assign
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWE5MTk2MDc4NjM2YTkwMzlkMDk3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4OTU3NzMzMywiZXhwIjoxNzg5NjYzNzMzfQ.vPaAEX9CK-I4vRENUDbuEWvgrNQPoASja8idtTOAoFY 
+Content-Type: application/json
+
+{
+  "assignedTo": "6aaa9196078636a9039d0979" 
+}
+
+### Get Admin Statistics
+GET http://localhost:5000/api/admin/stats
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWE5MTk2MDc4NjM2YTkwMzlkMDk3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4OTU3NzMzMywiZXhwIjoxNzg5NjYzNzMzfQ.vPaAEX9CK-I4vRENUDbuEWvgrNQPoASja8idtTOAoFY 
