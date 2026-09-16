@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, useNavigate } from "react-router-dom";
 import complaintService from "../services/complaintService";
 import { Badge, Spinner, Alert } from "../components/common";
 import "./ComplaintDetails.css";
@@ -8,6 +8,7 @@ const STATUS_META = {
   resolved:      { label: "Resolved",     icon: "✅" },
   "in-progress": { label: "In Progress",  icon: "🔄" },
   pending:       { label: "Pending",      icon: "⏳" },
+  rejected:      { label: "Rejected",     icon: "❌" },
 };
 
 const PRIORITY_META = {
@@ -19,22 +20,30 @@ const PRIORITY_META = {
 function formatDate(iso) {
   if (!iso) return "N/A";
   return new Date(iso).toLocaleDateString("en-IN", {
-    day: "numeric", month: "long", year: "numeric",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 }
 
 function ComplaintDetails() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [complaint, setComplaint] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [withdrawing, setWithdrawing] = useState(false);
+  const [actionError, setActionError] = useState(null);
 
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
     setError(null);
 
-    complaintService.getComplaintById(id)
+    complaintService
+      .getComplaintById(id)
       .then((data) => {
         if (isMounted) {
           setComplaint(data);
@@ -52,6 +61,22 @@ function ComplaintDetails() {
       isMounted = false;
     };
   }, [id]);
+
+  const handleWithdraw = async () => {
+    if (!window.confirm("Are you sure you want to withdraw this complaint? This cannot be undone.")) {
+      return;
+    }
+
+    setWithdrawing(true);
+    setActionError(null);
+    try {
+      await complaintService.deleteComplaint(id);
+      navigate("/complaints", { replace: true });
+    } catch (err) {
+      setActionError(err.message || "Failed to withdraw complaint. Please try again.");
+      setWithdrawing(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -91,6 +116,10 @@ function ComplaintDetails() {
           <span className="cd-bread-current">{complaint.id}</span>
         </div>
 
+        {actionError && (
+          <Alert type="error" message={actionError} style={{ marginBottom: "16px" }} />
+        )}
+
         {/* ── Header Card ─────────────────────────────── */}
         <div className="cd-header-card">
           <div className={`cd-header-accent cd-accent-${complaint.status}`} />
@@ -98,7 +127,7 @@ function ComplaintDetails() {
             <div className="cd-header-top">
               <div className="cd-header-meta">
                 <span className="cd-cat-badge">{complaint.categoryIcon || "📋"} {complaint.category}</span>
-                <span className="cd-id">{complaint.id}</span>
+                <span className="cd-id">ID: {complaint.id}</span>
               </div>
               <div className="cd-header-badges">
                 <Badge type="priority" variant={complaint.priority} label={pm.label} />
@@ -125,6 +154,37 @@ function ComplaintDetails() {
               <p className="cd-description">{complaint.description}</p>
             </div>
 
+            {/* Attached Photos */}
+            {complaint.images && complaint.images.length > 0 && (
+              <div className="cd-section">
+                <h2 className="cd-section-title">📷 Attached Photo Evidence</h2>
+                <div style={{ display: "flex", gap: "12px", flexWrap: "wrap", marginTop: "8px" }}>
+                  {complaint.images.map((imgUrl, idx) => (
+                    <div
+                      key={idx}
+                      style={{
+                        borderRadius: "8px",
+                        overflow: "hidden",
+                        border: "1px solid var(--border-color)",
+                        maxHeight: "220px",
+                      }}
+                    >
+                      <img
+                        src={imgUrl}
+                        alt={`Evidence ${idx + 1}`}
+                        style={{
+                          display: "block",
+                          maxWidth: "100%",
+                          maxHeight: "220px",
+                          objectFit: "cover",
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Location */}
             <div className="cd-section">
               <h2 className="cd-section-title">📍 Location Details</h2>
@@ -133,10 +193,18 @@ function ComplaintDetails() {
                   <span className="cd-info-label">Address</span>
                   <span className="cd-info-val">{complaint.address || "Not specified"}</span>
                 </div>
-                <div className="cd-info-item">
-                  <span className="cd-info-label">PIN Code</span>
-                  <span className="cd-info-val">{complaint.pincode || "560001"}</span>
-                </div>
+                {complaint.city && (
+                  <div className="cd-info-item">
+                    <span className="cd-info-label">City</span>
+                    <span className="cd-info-val">{complaint.city}</span>
+                  </div>
+                )}
+                {complaint.pincode && (
+                  <div className="cd-info-item">
+                    <span className="cd-info-label">PIN Code</span>
+                    <span className="cd-info-val">{complaint.pincode}</span>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -148,17 +216,26 @@ function ComplaintDetails() {
                 <div className="cd-sbox-val">{sm.label}</div>
                 {complaint.status === "resolved" && (
                   <div className="cd-sbox-note">
-                    This complaint has been successfully resolved. Thank you for helping improve your city!
+                    {complaint.adminNote
+                      ? `Resolution Note: ${complaint.adminNote}`
+                      : "This complaint has been successfully resolved. Thank you for helping improve your city!"}
                   </div>
                 )}
                 {complaint.status === "in-progress" && (
                   <div className="cd-sbox-note">
-                    Your complaint is being actively worked on by the responsible department.
+                    Your complaint is being actively worked on by the responsible municipal department.
                   </div>
                 )}
                 {complaint.status === "pending" && (
                   <div className="cd-sbox-note">
                     Your complaint is in the queue and will be assigned to the relevant department shortly.
+                  </div>
+                )}
+                {complaint.status === "rejected" && (
+                  <div className="cd-sbox-note">
+                    {complaint.adminNote
+                      ? `Reason: ${complaint.adminNote}`
+                      : "This complaint could not be processed."}
                   </div>
                 )}
               </div>
@@ -188,11 +265,17 @@ function ComplaintDetails() {
 
         </div>
 
-        {/* Back button */}
+        {/* Back button and Withdraw button */}
         <div className="cd-footer-actions">
           <Link to="/complaints" className="cd-back-btn">← Back to My Complaints</Link>
           {complaint.status === "pending" && (
-            <button className="cd-withdraw-btn">Withdraw Complaint</button>
+            <button
+              className="cd-withdraw-btn"
+              onClick={handleWithdraw}
+              disabled={withdrawing}
+            >
+              {withdrawing ? <Spinner size="sm" color="#ef4444" /> : "Withdraw Complaint"}
+            </button>
           )}
         </div>
 

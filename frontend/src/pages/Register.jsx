@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { Spinner } from "../components/common";
+import authService from "../services/authService";
 import "./Auth.css";
 
 const PERKS = [
@@ -14,7 +15,7 @@ const PERKS = [
 
 function Register() {
   const navigate = useNavigate();
-  const { loginWithData } = useAuth();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -28,10 +29,38 @@ function Register() {
 
   const password = watch("password", "");
 
+  const [serverError, setServerError] = useState("");
+
   const onSubmit = async (data) => {
-    // Register and auto-login with new account
-    await loginWithData(data);
-    navigate("/complaints", { replace: true });
+    setServerError("");
+
+    const registerResult = await authService.register({
+      name: data.fullName,
+      email: data.email,
+      password: data.password,
+      city: data.city,
+      phone: data.phone,
+      pincode: data.pincode,
+    });
+
+    if (!registerResult.success) {
+      setServerError(registerResult.message || "Registration failed. Please try again.");
+      return;
+    }
+
+    // Register doesn't return a token — auto-login to get one, passing user profile fields
+    const loginResult = await login(data.email, data.password, {
+      city: data.city,
+      phone: data.phone,
+      pincode: data.pincode,
+    });
+
+    if (loginResult.success) {
+      navigate("/complaints", { replace: true });
+    } else {
+      // Registered OK but login failed — send to login page
+      navigate("/login", { replace: true });
+    }
   };
 
   if (submitted) {
@@ -283,6 +312,13 @@ function Register() {
               </label>
               {errors.terms && <span className="auth-error">⚠ {errors.terms.message}</span>}
             </div>
+
+            {/* Server error */}
+            {serverError && (
+              <p className="auth-error" style={{ textAlign: "center", marginBottom: "0.5rem" }}>
+                ⚠ {serverError}
+              </p>
+            )}
 
             {/* Submit */}
             <button type="submit" className="auth-submit-btn" disabled={isSubmitting}>

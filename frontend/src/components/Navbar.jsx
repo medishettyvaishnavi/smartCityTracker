@@ -19,6 +19,26 @@ function Navbar() {
   const [avatarOpen, setAvatarOpen] = useState(false);
   const avatarRef = useRef(null);
 
+  // Derive initials from name — backend has no 'initials' field
+  const initials = user?.name
+    ? user.name.trim().split(/\s+/).map((w) => w[0].toUpperCase()).slice(0, 2).join("")
+    : "?";
+
+  // Real user location (read directly from authenticated user; no mock data)
+  const userLocation =
+    user?.city ||
+    (typeof user?.location === "string" ? user.location : user?.location?.city) ||
+    null;
+
+  const userJoined = user?.joinedAt || user?.createdAt;
+  const displayJoined = userJoined
+    ? new Date(userJoined).toLocaleDateString("en-IN", {
+        month: "short",
+        year: "numeric",
+      })
+    : null;
+
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
@@ -102,13 +122,13 @@ function Navbar() {
                   aria-expanded={avatarOpen}
                   title={user?.name || "Account"}
                 >
-                  <span className="nav-avatar-initials">{user?.initials || "U"}</span>
+                  <span className="nav-avatar-initials">{initials}</span>
                 </button>
 
                 {avatarOpen && (
                   <div className="nav-dropdown">
                     <div className="nav-dropdown-user">
-                      <div className="nav-dropdown-avatar">{user?.initials || "U"}</div>
+                      <div className="nav-dropdown-avatar">{initials}</div>
                       <div>
                         <div className="nav-dropdown-name">{user?.name}</div>
                         <div className="nav-dropdown-email">{user?.email}</div>
@@ -116,8 +136,8 @@ function Navbar() {
                     </div>
                     <div className="nav-dropdown-divider" />
                     <div className="nav-dropdown-meta">
-                      <span>📍 {user?.city}</span>
-                      <span>🗓️ Joined {user?.joinedAt}</span>
+                      <span>📍 {userLocation || "Location not set"}</span>
+                      {displayJoined && <span>🗓️ Joined {displayJoined}</span>}
                     </div>
                     <div className="nav-dropdown-divider" />
                     <Link to="/complaints" className="nav-dropdown-item" onClick={handleLinkClick}>
@@ -190,10 +210,15 @@ function Navbar() {
           <>
             {/* User info strip */}
             <div className="nav-mobile-user">
-              <div className="nav-mobile-avatar">{user?.initials || "U"}</div>
+              <div className="nav-mobile-avatar">{initials}</div>
               <div>
                 <div className="nav-mobile-user-name">{user?.name}</div>
                 <div className="nav-mobile-user-email">{user?.email}</div>
+                {userLocation && (
+                  <div style={{ fontSize: "0.74rem", color: "var(--text-muted)", marginTop: "2px" }}>
+                    📍 {userLocation}
+                  </div>
+                )}
               </div>
             </div>
             <div className="nav-mobile-divider" />

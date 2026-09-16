@@ -1,22 +1,21 @@
 import { useForm } from "react-hook-form";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 import complaintService from "../services/complaintService";
-import { Spinner } from "../components/common";
+import { Spinner, Alert } from "../components/common";
 import "./ReportComplaint.css";
 
 const CATEGORIES = [
   { value: "", label: "-- Select a category --" },
-  { value: "roads", label: "🛣️ Roads & Potholes" },
-  { value: "water", label: "💧 Water Supply" },
-  { value: "electricity", label: "⚡ Electricity" },
-  { value: "sanitation", label: "🗑️ Sanitation & Garbage" },
-  { value: "streetlights", label: "💡 Street Lights" },
-  { value: "parks", label: "🌳 Parks & Public Spaces" },
-  { value: "drainage", label: "🌊 Drainage & Flooding" },
-  { value: "noise", label: "🔊 Noise Pollution" },
-  { value: "traffic", label: "🚦 Traffic & Signals" },
-  { value: "other", label: "📋 Other" },
+  { value: "Roads & Infrastructure", label: "🛣️ Roads & Infrastructure" },
+  { value: "Water Supply", label: "💧 Water Supply" },
+  { value: "Electricity", label: "⚡ Electricity" },
+  { value: "Sanitation & Garbage", label: "🗑️ Sanitation & Garbage" },
+  { value: "Public Safety", label: "🛡️ Public Safety" },
+  { value: "Parks & Recreation", label: "🌳 Parks & Recreation" },
+  { value: "Noise Pollution", label: "🔊 Noise Pollution" },
+  { value: "Other", label: "📋 Other" },
 ];
 
 const PRIORITIES = [
@@ -26,25 +25,52 @@ const PRIORITIES = [
 ];
 
 function ReportComplaint() {
+  const { user } = useAuth();
   const [createdComplaint, setCreatedComplaint] = useState(null);
   const [selectedPriority, setSelectedPriority] = useState("medium");
   const [charCount, setCharCount] = useState(0);
   const [imagePreview, setImagePreview] = useState(null);
+  const [submitError, setSubmitError] = useState(null);
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isSubmitting },
-  } = useForm({ defaultValues: { priority: "medium" } });
+  } = useForm({
+    defaultValues: {
+      fullName: user?.name || "",
+      email: user?.email || "",
+      city: "Hyderabad",
+      priority: "medium",
+    },
+  });
+
+  useEffect(() => {
+    if (user?.name) setValue("fullName", user.name);
+    if (user?.email) setValue("email", user.email);
+  }, [user, setValue]);
 
   const onSubmit = async (data) => {
-    const created = await complaintService.createComplaint({
-      ...data,
-      priority: selectedPriority,
-      imagePreview,
-    });
-    setCreatedComplaint(created);
+    setSubmitError(null);
+    try {
+      const created = await complaintService.createComplaint({
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        priority: selectedPriority,
+        address: data.address,
+        city: data.city || "Hyderabad",
+        pincode: data.pincode,
+        imagePreview,
+      });
+      setCreatedComplaint(created);
+    } catch (err) {
+      setSubmitError(
+        err.message || "Failed to submit complaint. Please check your connection and try again."
+      );
+    }
   };
 
   const handleReset = () => {
@@ -53,6 +79,9 @@ function ReportComplaint() {
     setSelectedPriority("medium");
     setCharCount(0);
     setImagePreview(null);
+    setSubmitError(null);
+    if (user?.name) setValue("fullName", user.name);
+    if (user?.email) setValue("email", user.email);
   };
 
   const handleImageChange = (e) => {
@@ -71,8 +100,8 @@ function ReportComplaint() {
           <div className="rc-success-icon">✅</div>
           <h2>Complaint Submitted!</h2>
           <p>
-            Your complaint has been registered successfully. Our team will review
-            it shortly. Track progress under <strong>My Complaints</strong>.
+            Your complaint has been registered successfully on the smart city network.
+            Track progress and updates under <strong>My Complaints</strong>.
           </p>
           <div className="rc-success-id">
             Reference ID: <strong>#{createdComplaint.id}</strong>
@@ -98,10 +127,18 @@ function ReportComplaint() {
           <div>
             <h1 className="rc-title">Report a City Issue</h1>
             <p className="rc-subtitle">
-              Help us improve your city — every complaint matters.
+              Help us improve your city — every complaint is logged directly in MongoDB.
             </p>
           </div>
         </div>
+
+        {submitError && (
+          <Alert
+            type="error"
+            message={submitError}
+            style={{ marginBottom: "20px" }}
+          />
+        )}
 
         <form className="rc-form" onSubmit={handleSubmit(onSubmit)} noValidate>
 
@@ -115,7 +152,7 @@ function ReportComplaint() {
                 id="fullName"
                 type="text"
                 className={`rc-input ${errors.fullName ? "rc-input-error" : ""}`}
-                placeholder="John Doe"
+                placeholder="Citizen Name"
                 {...register("fullName", {
                   required: "Full name is required",
                   minLength: { value: 2, message: "Name must be at least 2 characters" },
@@ -132,7 +169,7 @@ function ReportComplaint() {
                 id="email"
                 type="email"
                 className={`rc-input ${errors.email ? "rc-input-error" : ""}`}
-                placeholder="john@example.com"
+                placeholder="citizen@example.com"
                 {...register("email", {
                   required: "Email is required",
                   pattern: {
@@ -145,43 +182,21 @@ function ReportComplaint() {
             </div>
           </div>
 
-          {/* Phone + Category */}
-          <div className="rc-row">
-            <div className="rc-field">
-              <label className="rc-label" htmlFor="phone">
-                Phone Number <span className="rc-required">*</span>
-              </label>
-              <input
-                id="phone"
-                type="tel"
-                className={`rc-input ${errors.phone ? "rc-input-error" : ""}`}
-                placeholder="+91 98765 43210"
-                {...register("phone", {
-                  required: "Phone number is required",
-                  pattern: {
-                    value: /^[+]?[\d\s\-()]{7,15}$/,
-                    message: "Enter a valid phone number",
-                  },
-                })}
-              />
-              {errors.phone && <span className="rc-error">{errors.phone.message}</span>}
-            </div>
-
-            <div className="rc-field">
-              <label className="rc-label" htmlFor="category">
-                Issue Category <span className="rc-required">*</span>
-              </label>
-              <select
-                id="category"
-                className={`rc-input rc-select ${errors.category ? "rc-input-error" : ""}`}
-                {...register("category", { required: "Please select a category" })}
-              >
-                {CATEGORIES.map((c) => (
-                  <option key={c.value} value={c.value}>{c.label}</option>
-                ))}
-              </select>
-              {errors.category && <span className="rc-error">{errors.category.message}</span>}
-            </div>
+          {/* Category */}
+          <div className="rc-field">
+            <label className="rc-label" htmlFor="category">
+              Issue Category <span className="rc-required">*</span>
+            </label>
+            <select
+              id="category"
+              className={`rc-input rc-select ${errors.category ? "rc-input-error" : ""}`}
+              {...register("category", { required: "Please select a category" })}
+            >
+              {CATEGORIES.map((c) => (
+                <option key={c.value} value={c.value}>{c.label}</option>
+              ))}
+            </select>
+            {errors.category && <span className="rc-error">{errors.category.message}</span>}
           </div>
 
           {/* Complaint Title */}
@@ -193,19 +208,19 @@ function ReportComplaint() {
               id="title"
               type="text"
               className={`rc-input ${errors.title ? "rc-input-error" : ""}`}
-              placeholder="e.g. Large pothole on MG Road near Bus Stand"
+              placeholder="e.g. Broken water pipe causing street overflow"
               {...register("title", {
                 required: "Complaint title is required",
-                minLength: { value: 10, message: "Title must be at least 10 characters" },
+                minLength: { value: 6, message: "Title must be at least 6 characters" },
                 maxLength: { value: 120, message: "Title must not exceed 120 characters" },
               })}
             />
             {errors.title && <span className="rc-error">{errors.title.message}</span>}
           </div>
 
-          {/* Address + PIN */}
+          {/* Address, City + PIN */}
           <div className="rc-row">
-            <div className="rc-field">
+            <div className="rc-field" style={{ flex: 2 }}>
               <label className="rc-label" htmlFor="address">
                 Street Address / Landmark <span className="rc-required">*</span>
               </label>
@@ -219,20 +234,31 @@ function ReportComplaint() {
               {errors.address && <span className="rc-error">{errors.address.message}</span>}
             </div>
 
-            <div className="rc-field">
+            <div className="rc-field" style={{ flex: 1 }}>
+              <label className="rc-label" htmlFor="city">
+                City <span className="rc-required">*</span>
+              </label>
+              <input
+                id="city"
+                type="text"
+                className={`rc-input ${errors.city ? "rc-input-error" : ""}`}
+                placeholder="Hyderabad"
+                {...register("city", { required: "City is required" })}
+              />
+              {errors.city && <span className="rc-error">{errors.city.message}</span>}
+            </div>
+
+            <div className="rc-field" style={{ flex: 1 }}>
               <label className="rc-label" htmlFor="pincode">
-                PIN Code <span className="rc-required">*</span>
+                PIN Code <span className="rc-optional">(optional)</span>
               </label>
               <input
                 id="pincode"
                 type="text"
                 className={`rc-input ${errors.pincode ? "rc-input-error" : ""}`}
-                placeholder="560001"
+                placeholder="500081"
                 maxLength={6}
-                {...register("pincode", {
-                  required: "PIN code is required",
-                  pattern: { value: /^\d{6}$/, message: "Enter a valid 6-digit PIN code" },
-                })}
+                {...register("pincode")}
               />
               {errors.pincode && <span className="rc-error">{errors.pincode.message}</span>}
             </div>
@@ -246,12 +272,12 @@ function ReportComplaint() {
             <textarea
               id="description"
               className={`rc-input rc-textarea ${errors.description ? "rc-input-error" : ""}`}
-              placeholder="Describe the issue — when did it start, how severe is it, how many people are affected..."
+              placeholder="Describe the issue — when did it start, how severe is it, what is affected..."
               rows={5}
               maxLength={1000}
               {...register("description", {
                 required: "Description is required",
-                minLength: { value: 30, message: "Please provide at least 30 characters" },
+                minLength: { value: 15, message: "Please provide at least 15 characters" },
                 onChange: (e) => setCharCount(e.target.value.length),
               })}
             />
@@ -287,14 +313,13 @@ function ReportComplaint() {
             </label>
             <label className="rc-file-label" htmlFor="image">
               <span className="rc-file-icon">📎</span>
-              <span>Click to upload or drag &amp; drop</span>
+              <span>Click to upload photo</span>
               <span className="rc-file-hint">PNG, JPG, WEBP up to 5MB</span>
               <input
                 id="image"
                 type="file"
                 accept="image/*"
                 className="rc-file-input"
-                {...register("image")}
                 onChange={handleImageChange}
               />
             </label>
@@ -314,11 +339,10 @@ function ReportComplaint() {
               <input
                 type="checkbox"
                 className="rc-checkbox"
-                {...register("consent", { required: "You must agree to proceed" })}
+                {...register("consent", { required: "You must confirm to proceed" })}
               />
               <span>
-                I confirm that the information provided is accurate and I agree to the{" "}
-                <a href="#" className="rc-link">Terms of Service</a>.{" "}
+                I confirm that the information provided is accurate and represent a genuine civic issue.{" "}
                 <span className="rc-required">*</span>
               </span>
             </label>
