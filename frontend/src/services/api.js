@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api";
+
 const TIMEOUT = Number(import.meta.env.VITE_API_TIMEOUT) || 10000;
 
 /**
@@ -20,10 +22,14 @@ const api = axios.create({
  */
 api.interceptors.request.use(
   (config) => {
-    const token = sessionStorage.getItem("sc_token") || localStorage.getItem("sc_token");
+    const token =
+      sessionStorage.getItem("sc_token") ||
+      localStorage.getItem("sc_token");
+
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
   },
   (error) => {
@@ -33,7 +39,7 @@ api.interceptors.request.use(
 
 /**
  * Response Interceptor:
- * Standardizes errors and handles 401 Unauthorized (expired token)
+ * Standardizes errors and handles 401 Unauthorized
  */
 api.interceptors.response.use(
   (response) => {
@@ -41,23 +47,23 @@ api.interceptors.response.use(
   },
   (error) => {
     if (error.response) {
-      // Server responded with an error status
       const { status, data } = error.response;
 
       if (status === 401) {
-        // Token expired or invalid
         sessionStorage.removeItem("sc_token");
         sessionStorage.removeItem("sc_user");
-        // We avoid hard window.location here to let React Router handle state,
-        // but dispatch an event for any auth listeners
+
         window.dispatchEvent(new CustomEvent("sct:auth-expired"));
       }
 
-      const message = data?.message || `Request failed with status ${status}`;
+      const message =
+        data?.message || `Request failed with status ${status}`;
+
       return Promise.reject(new Error(message));
     } else if (error.request) {
-      // Network error or server not running
-      return Promise.reject(new Error("Network error: Unable to connect to server."));
+      return Promise.reject(
+        new Error("Network error: Unable to connect to server.")
+      );
     } else {
       return Promise.reject(error);
     }

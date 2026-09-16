@@ -7,6 +7,22 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   // Read authenticated user state via authService
   const [user, setUser] = useState(() => authService.getCurrentUser());
+  // Starts true — flips false after first effect so ProtectedRoute
+  // never redirects before sessionStorage has been read
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const hydrate = async () => {
+      if (authService.isAuthenticated()) {
+        const freshUser = await authService.getProfile();
+        if (freshUser) {
+          setUser(freshUser);
+        }
+      }
+      setIsLoading(false);
+    };
+    hydrate();
+  }, []);
 
   useEffect(() => {
     const handleAuthExpired = () => {
@@ -16,10 +32,14 @@ export function AuthProvider({ children }) {
     return () => window.removeEventListener("sct:auth-expired", handleAuthExpired);
   }, []);
 
-  const login = useCallback(async (email, password) => {
+  const login = useCallback(async (email, password, extraData = {}) => {
     const result = await authService.login(email, password);
     if (result.success) {
-      setUser(result.user);
+      const mergedUser = { ...result.user, ...extraData };
+      if (extraData?.city && !result.user?.city) {
+        sessionStorage.setItem("sc_user", JSON.stringify(mergedUser));
+      }
+      setUser(mergedUser);
       return { success: true };
     }
     return { success: false, message: result.message };
@@ -40,7 +60,9 @@ export function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, login, loginWithData, logout, isLoggedIn: !!user }}>
+    <AuthContext.Provider
+      value={{ user, login, loginWithData, logout, isLoggedIn: !!user, isLoading }}
+    >
       {children}
     </AuthContext.Provider>
   );
