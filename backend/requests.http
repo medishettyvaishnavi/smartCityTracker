@@ -50,7 +50,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYTk3ZTI5N
 
 {
   "title": "Garbage not collected",
-  "description": "Garbage has not been collected for three days.",
+  "description": "Garbage has not been collected for three days on the main street.",
   "category": "Sanitation & Garbage",
   "priority": "medium",
   "location": {
@@ -64,6 +64,24 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYTk3ZTI5N
   "images": []
 }
 
-### Get My Complaints
+### Get My Complaints (All)
 GET http://localhost:5000/api/complaints
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYTk3ZTI5NzEyMTljNTRkZjY5ZTAyYiIsInJvbGUiOiJjaXRpemVuIiwiaWF0IjoxNzg5NDkyOTUwLCJleHAiOjE3ODk1NzkzNTB9.cn6WJYjiAaIMjcaNGG76tET-dTrHMf3mE9WVWTTAN34
+
+### Get Complaints Filtered by Status & Search
+GET http://localhost:5000/api/complaints?status=pending&search=Garbage&sortBy=newest
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYTk3ZTI5NzEyMTljNTRkZjY5ZTAyYiIsInJvbGUiOiJjaXRpemVuIiwiaWF0IjoxNzg5NDkyOTUwLCJleHAiOjE3ODk1NzkzNTB9.cn6WJYjiAaIMjcaNGG76tET-dTrHMf3mE9WVWTTAN34
+
+### Get Complaint Statistics
+GET http://localhost:5000/api/complaints/stats
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYTk3ZTI5NzEyMTljNTRkZjY5ZTAyYiIsInJvbGUiOiJjaXRpemVuIiwiaWF0IjoxNzg5NDkyOTUwLCJleHAiOjE3ODk1NzkzNTB9.cn6WJYjiAaIMjcaNGG76tET-dTrHMf3mE9WVWTTAN34
+
+### Get Complaint Details by ID
+# Replace with a real complaint ID from the listing
+GET http://localhost:5000/api/complaints/6aa99a191927328b543178fd
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYTk3ZTI5NzEyMTljNTRkZjY5ZTAyYiIsInJvbGUiOiJjaXRpemVuIiwiaWF0IjoxNzg5NDkyOTUwLCJleHAiOjE3ODk1NzkzNTB9.cn6WJYjiAaIMjcaNGG76tET-dTrHMf3mE9WVWTTAN34
+
+### Withdraw / Delete Complaint
+# Replace with a real complaint ID
+DELETE http://localhost:5000/api/complaints/6aa99a191927328b543178fd
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYTk3ZTI5NzEyMTljNTRkZjY5ZTAyYiIsInJvbGUiOiJjaXRpemVuIiwiaWF0IjoxNzg5NDkyOTUwLCJleHAiOjE3ODk1NzkzNTB9.cn6WJYjiAaIMjcaNGG76tET-dTrHMf3mE9WVWTTAN34
