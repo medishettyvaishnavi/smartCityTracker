@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import WeatherCard from "../components/WeatherCard";
 import "./Home.css";
 
 const STATS = [
@@ -166,6 +167,12 @@ function Home() {
           </div>
         </section>
       )}
+
+      <section className="section">
+        <div className="section-inner">
+          <WeatherCard city="Hyderabad" />
+        </div>
+      </section>
 
       {/* ── Stats ────────────────────────────────────── */}
       <section className="stats-bar">

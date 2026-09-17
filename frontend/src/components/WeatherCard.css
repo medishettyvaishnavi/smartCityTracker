@@ -1,0 +1,148 @@
+/* WeatherCard component styling */
+.weather-widget {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 4px 20px var(--card-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.weather-widget:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px var(--card-shadow);
+}
+
+/* Header */
+.weather-widget-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 16px;
+}
+
+.weather-widget-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--pastel-accent);
+  background: var(--pastel-accent-soft);
+  padding: 4px 10px;
+  border-radius: 20px;
+  margin-bottom: 6px;
+}
+
+.weather-widget-city {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.weather-widget-temp {
+  display: flex;
+  align-items: baseline;
+  font-size: 2.2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  line-height: 1;
+}
+
+.weather-widget-unit {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--pastel-accent);
+  margin-left: 2px;
+}
+
+/* Description & condition */
+.weather-widget-desc {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  text-transform: capitalize;
+  margin: 0 0 16px;
+}
+
+/* Details grid */
+.weather-widget-details {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-color);
+  font-size: 0.88rem;
+  color: var(--text-muted);
+}
+
+.weather-widget-details strong {
+  color: var(--text-primary);
+}
+
+/* Loading state */
+.weather-widget-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  gap: 12px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+/* Error state */
+.weather-widget-error {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: 14px;
+}
+
+.weather-error-icon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+}
+
+.weather-error-body {
+  flex: 1;
+}
+
+.weather-error-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #ef4444;
+  margin: 0 0 4px;
+}
+
+.weather-error-msg {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.weather-retry-btn {
+  background: var(--bg-card);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: #ef4444;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.weather-retry-btn:hover {
+  background: #ef4444;
+  color: #ffffff;
+}

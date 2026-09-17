@@ -59,11 +59,13 @@ api.interceptors.response.use(
       const message =
         data?.message || `Request failed with status ${status}`;
 
-      return Promise.reject(new Error(message));
+      const err = new Error(message);
+      err.response = error.response;
+      return Promise.reject(err);
     } else if (error.request) {
-      return Promise.reject(
-        new Error("Network error: Unable to connect to server.")
-      );
+      const err = new Error("Network error: Unable to connect to server.");
+      err.request = error.request;
+      return Promise.reject(err);
     } else {
       return Promise.reject(error);
     }

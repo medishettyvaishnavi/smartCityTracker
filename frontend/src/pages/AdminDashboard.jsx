@@ -50,7 +50,11 @@ function AdminDashboard() {
       setStats(statData || {});
       setAdmins(adminData?.admins || []);
     } catch (err) {
-      setError(err.message || "Could not load the admin workspace.");
+      console.error("Admin loadData error:", err);
+      const message =
+        err.response?.data?.message ||
+        (err.request ? "Unable to connect to the server" : err.message || "Could not load the admin workspace.");
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -69,7 +73,11 @@ function AdminDashboard() {
       const refreshedStats = await adminService.getStats();
       setStats(refreshedStats || {});
     } catch (err) {
-      setError(err.message || "Could not update the complaint.");
+      console.error("Admin updateStatus error:", err);
+      const message =
+        err.response?.data?.message ||
+        (err.request ? "Unable to connect to the server" : err.message || "Could not update the complaint.");
+      setError(message);
     } finally {
       setSavingId("");
     }
@@ -82,7 +90,11 @@ function AdminDashboard() {
       const result = await adminService.assignComplaint(id, adminId || null);
       setComplaints((current) => current.map((item) => getId(item) === id ? result.complaint : item));
     } catch (err) {
-      setError(err.message || "Could not assign the complaint.");
+      console.error("Admin assignComplaint error:", err);
+      const message =
+        err.response?.data?.message ||
+        (err.request ? "Unable to connect to the server" : err.message || "Could not assign the complaint.");
+      setError(message);
     } finally {
       setSavingId("");
     }

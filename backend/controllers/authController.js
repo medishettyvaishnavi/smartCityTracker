@@ -184,6 +184,8 @@ export const getMe = async (req, res) => {
   }
 };
 
+export const getCurrentUser = getMe;
+
 // ==================== UPDATE USER PROFILE / LOCATION ====================
 
 export const updateProfile = async (req, res) => {

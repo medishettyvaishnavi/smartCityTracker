@@ -9,7 +9,6 @@ import complaintRoutes from "./routes/complaintRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import authMiddleware from "./middleware/authMiddleware.js";
 import adminMiddleware from "./middleware/adminMiddleware.js";
-import adminRoutes from "./routes/adminRoutes.js";
 import weatherRoutes from "./routes/weatherRoutes.js";
 
 const currentFile = fileURLToPath(import.meta.url);
@@ -59,3 +58,4 @@ connectDB();
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
