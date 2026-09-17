@@ -135,3 +135,12 @@ Content-Type: application/json
 ### Get Admin Statistics
 GET http://localhost:5000/api/admin/stats
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWE5MTk2MDc4NjM2YTkwMzlkMDk3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4OTU3NzMzMywiZXhwIjoxNzg5NjYzNzMzfQ.vPaAEX9CK-I4vRENUDbuEWvgrNQPoASja8idtTOAoFY 
+
+###Api to get weather data for a specific city
+GET http://localhost:5000/api/weather?city=Hyderabad
+
+###
+GET http://localhost:5000/api/weather
+
+###
+GET http://localhost:5000/api/weather?city=asdfghjkl12345
