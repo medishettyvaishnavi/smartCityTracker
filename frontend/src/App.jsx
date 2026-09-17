@@ -13,6 +13,7 @@ import ReportComplaint from "./pages/ReportComplaint";
 import MyComplaints from "./pages/MyComplaints";
 import ComplaintDetails from "./pages/ComplaintDetails";
 import AdminDashboard from "./pages/AdminDashboard";
+import Assistant from "./pages/Assistant";
 
 function App() {
   const routes = (
@@ -56,6 +57,7 @@ function App() {
           </ProtectedRoute>
         }
       />
+      <Route path="/assistant" element={<Assistant />} />
     </Routes>
   );
 
