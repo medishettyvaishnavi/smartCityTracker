@@ -6,7 +6,7 @@ import User from "../models/User.js";
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, location, city, address, phone, pincode } = req.body;
 
     // Check required fields
     if (!name || !email || !password) {
@@ -24,14 +24,37 @@ export const registerUser = async (req, res) => {
       });
     }
 
+    // Normalize location fields (support object, string, or city/address/pincode)
+    let locCity = city?.trim() || "";
+    let locAddress = address?.trim() || "";
+    let locPincode = pincode?.trim() || "";
+
+    if (location) {
+      if (typeof location === "string") {
+        locCity = locCity || location.trim();
+      } else if (typeof location === "object") {
+        locCity = locCity || location.city?.trim() || "";
+        locAddress = locAddress || location.address?.trim() || "";
+        locPincode = locPincode || location.pincode?.trim() || "";
+      }
+    }
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
+    // Create user in database
     const user = await User.create({
-      name,
-      email,
+      name: name.trim(),
+      email: email.trim().toLowerCase(),
       password: hashedPassword,
+      location: {
+        city: locCity,
+        address: locAddress,
+        pincode: locPincode,
+      },
+      city: locCity,
+      phone: phone?.trim() || "",
+      pincode: locPincode,
     });
 
     // Send response
@@ -42,6 +65,11 @@ export const registerUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        location: user.location,
+        city: user.city || user.location?.city || "",
+        phone: user.phone || "",
+        pincode: user.pincode || user.location?.pincode || "",
+        joinedAt: user.createdAt,
       },
     });
   } catch (error) {
@@ -108,6 +136,11 @@ export const loginUser = async (req, res) => {
         name: user.name,
         email: user.email,
         role: user.role,
+        location: user.location || { city: user.city || "" },
+        city: user.city || user.location?.city || "",
+        phone: user.phone || "",
+        pincode: user.pincode || user.location?.pincode || "",
+        joinedAt: user.createdAt,
       },
     });
   } catch (error) {
@@ -118,11 +151,11 @@ export const loginUser = async (req, res) => {
   }
 };
 
-// GET /api/auth/me
-// Return the authenticated user's current profile
-export const getCurrentUser = async (req, res) => {
+// ==================== CURRENT USER PROFILE ====================
+
+export const getMe = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select("name email role createdAt");
+    const user = await User.findById(req.user.id).select("-password");
 
     if (!user) {
       return res.status(404).json({
@@ -130,10 +163,93 @@ export const getCurrentUser = async (req, res) => {
       });
     }
 
-    res.status(200).json({ user });
+    res.status(200).json({
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        location: user.location || { city: user.city || "" },
+        city: user.city || user.location?.city || "",
+        phone: user.phone || "",
+        pincode: user.pincode || user.location?.pincode || "",
+        joinedAt: user.createdAt,
+      },
+    });
   } catch (error) {
     res.status(500).json({
-      message: "Failed to fetch profile",
+      message: "Failed to fetch user profile",
+      error: error.message,
+    });
+  }
+};
+
+// ==================== UPDATE USER PROFILE / LOCATION ====================
+
+export const updateProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+
+    if (!user) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+
+    const { name, location, city, address, phone, pincode } = req.body;
+
+    if (name) user.name = name.trim();
+    if (phone !== undefined) user.phone = phone.trim();
+
+    let locCity = city;
+    let locAddress = address;
+    let locPincode = pincode;
+
+    if (location) {
+      if (typeof location === "string") {
+        locCity = locCity || location.trim();
+      } else if (typeof location === "object") {
+        locCity = locCity || location.city?.trim();
+        locAddress = locAddress || location.address?.trim();
+        locPincode = locPincode || location.pincode?.trim();
+      }
+    }
+
+    if (!user.location) {
+      user.location = {};
+    }
+
+    if (locCity !== undefined) {
+      user.city = locCity;
+      user.location.city = locCity;
+    }
+    if (locAddress !== undefined) {
+      user.location.address = locAddress;
+    }
+    if (locPincode !== undefined) {
+      user.pincode = locPincode;
+      user.location.pincode = locPincode;
+    }
+
+    await user.save();
+
+    res.status(200).json({
+      message: "Profile updated successfully",
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        location: user.location,
+        city: user.city || user.location?.city || "",
+        phone: user.phone || "",
+        pincode: user.pincode || user.location?.pincode || "",
+        joinedAt: user.createdAt,
+      },
+    });
+  } catch (error) {
+    res.status(500).json({
+      message: "Failed to update profile",
       error: error.message,
     });
   }

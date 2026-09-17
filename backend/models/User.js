@@ -26,6 +26,42 @@ const userSchema = new mongoose.Schema(
       enum: ["citizen", "admin"],
       default: "citizen",
     },
+
+    location: {
+      address: {
+        type: String,
+        trim: true,
+        default: "",
+      },
+      city: {
+        type: String,
+        trim: true,
+        default: "",
+      },
+      pincode: {
+        type: String,
+        trim: true,
+        default: "",
+      },
+    },
+
+    city: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    phone: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    pincode: {
+      type: String,
+      trim: true,
+      default: "",
+    },
   },
   {
     timestamps: true,

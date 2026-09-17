@@ -1,31 +1,49 @@
 import express from "express";
 import {
-	assignComplaint,
-	getAdmins,
-	getAllComplaints,
-	getDashboardStats,
-	updateComplaintStatus,
+  getAllComplaints,
+  updateComplaintStatus,
+  assignComplaint,
+  getAdminUsers,
+  getAdminStats,
 } from "../controllers/adminController.js";
 import authMiddleware from "../middleware/authMiddleware.js";
 import adminMiddleware from "../middleware/adminMiddleware.js";
 
 const router = express.Router();
 
-router.use(authMiddleware, adminMiddleware);
+router.get(
+  "/complaints",
+  authMiddleware,
+  adminMiddleware,
+  getAllComplaints
+);
 
-// GET /api/admin/complaints - Get all complaints with filtering
-router.get("/complaints", getAllComplaints);
+router.put(
+  "/complaints/:id/status",
+  authMiddleware,
+  adminMiddleware,
+  updateComplaintStatus
+);
 
-// GET /api/admin/admins - Get admins available for assignment
-router.get("/admins", getAdmins);
+router.put(
+  "/complaints/:id/assign",
+  authMiddleware,
+  adminMiddleware,
+  assignComplaint
+);
 
-// GET /api/admin/stats - Get statistics for dashboard
-router.get("/stats", getDashboardStats);
+router.get(
+  "/admins",
+  authMiddleware,
+  adminMiddleware,
+  getAdminUsers
+);
 
-// PUT /api/admin/complaints/:id/status - Update complaint status
-router.put("/complaints/:id/status", updateComplaintStatus);
-
-// PUT /api/admin/complaints/:id/assign - Assign complaint to an admin
-router.put("/complaints/:id/assign", assignComplaint);
+router.get(
+  "/stats",
+  authMiddleware,
+  adminMiddleware,
+  getAdminStats
+);
 
 export default router;

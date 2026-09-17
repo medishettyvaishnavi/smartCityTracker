@@ -78,6 +78,11 @@ const complaintSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+
+    assignedTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+    },
   },
   {
     timestamps: true,
