@@ -53,7 +53,7 @@ const inferIntentWithoutGemini = (query) => {
   return "GENERAL_QUESTION";
 };
 
-export const detectIntent = async (query) => {
+export const detectIntent = async (query, history = []) => {
   const normalizedQuery = query.toLowerCase();
 
   if (
@@ -88,6 +88,9 @@ GENERAL_QUESTION
 User question:
 "${query}"
 
+Previous conversation:
+${JSON.stringify(history, null, 2)}
+
 Return ONLY the intent name.
 Do not provide an explanation.
 `;
@@ -105,7 +108,7 @@ Do not provide an explanation.
   }
 };
 
-export const generateNaturalResponse = async (query, context) => {
+export const generateNaturalResponse = async (query, context, history = []) => {
   const ai = createGeminiClient();
   const prompt = `
 You are the Smart City Assistant for a citizen complaint and service tracking application.
@@ -120,6 +123,9 @@ Keep the answer short, clear, friendly, and conversational.
 
 User question:
 ${query}
+
+Previous conversation:
+${JSON.stringify(history, null, 2)}
 
 Context:
 ${JSON.stringify(context, null, 2)}

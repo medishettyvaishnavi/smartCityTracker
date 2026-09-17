@@ -14,6 +14,18 @@ const formatComplaintFallback = (complaints, includeCategory = false) => {
   return `Here is the latest information for your complaints: ${details.join("; ")}.`;
 };
 
+const formatStatusFallback = (complaints, history) => {
+  const historyText = history
+    .map((message) => message.content)
+    .join(" ")
+    .toLowerCase();
+  const referencedComplaint = complaints.find((complaint) =>
+    historyText.includes(complaint.title.toLowerCase())
+  ) || complaints[0];
+
+  return `The status of your complaint "${referencedComplaint.title}" is ${referencedComplaint.status}.`;
+};
+
 const findRelevantComplaints = (complaints, query) => {
   const ignoredWords = new Set([
     "about",
@@ -107,7 +119,7 @@ const formatWeatherFallback = (weather, city) =>
 
 export const handleAssistantQuery = async (req, res) => {
   try {
-    const { query } = req.body;
+    const { query, history = [] } = req.body;
 
     if (!query || !query.trim()) {
       return res.status(400).json({
@@ -115,7 +127,17 @@ export const handleAssistantQuery = async (req, res) => {
       });
     }
 
-    const intent = await detectIntent(query);
+    const safeHistory = Array.isArray(history)
+      ? history
+          .filter(
+            (message) =>
+              (message?.role === "user" || message?.role === "assistant") &&
+              typeof message.content === "string"
+          )
+          .slice(-12)
+      : [];
+
+    const intent = await detectIntent(query, safeHistory);
 
     console.log("User query:", query);
     console.log("Detected intent:", intent);
@@ -144,7 +166,7 @@ export const handleAssistantQuery = async (req, res) => {
 
       let answer;
       try {
-        answer = await generateNaturalResponse(query, complaintContext);
+        answer = await generateNaturalResponse(query, complaintContext, safeHistory);
       } catch (error) {
         if (!isGeminiUnavailable(error)) throw error;
         answer = formatComplaintFallback(complaintContext, true);
@@ -183,7 +205,7 @@ export const handleAssistantQuery = async (req, res) => {
 
       let answer;
       try {
-        answer = await generateNaturalResponse(query, detailsContext);
+        answer = await generateNaturalResponse(query, detailsContext, safeHistory);
       } catch (error) {
         if (!isGeminiUnavailable(error)) throw error;
         answer = formatDetailsFallback(relevantComplaints);
@@ -218,10 +240,10 @@ export const handleAssistantQuery = async (req, res) => {
 
       let answer;
       try {
-        answer = await generateNaturalResponse(query, statusContext);
+        answer = await generateNaturalResponse(query, statusContext, safeHistory);
       } catch (error) {
         if (!isGeminiUnavailable(error)) throw error;
-        answer = formatComplaintFallback(statusContext);
+        answer = formatStatusFallback(statusContext, safeHistory);
       }
 
       return res.status(200).json({
@@ -247,7 +269,7 @@ export const handleAssistantQuery = async (req, res) => {
 
       let answer;
       try {
-        answer = await generateNaturalResponse(query, weatherContext);
+        answer = await generateNaturalResponse(query, weatherContext, safeHistory);
       } catch (error) {
         if (!isGeminiUnavailable(error)) throw error;
         answer = formatWeatherFallback(weather, city);
@@ -275,7 +297,7 @@ export const handleAssistantQuery = async (req, res) => {
             "View submitted complaints",
             "Check weather",
           ],
-        });
+        }, safeHistory);
       } catch (error) {
         if (!isGeminiUnavailable(error)) throw error;
         answer = formatGeneralFallback(query);
