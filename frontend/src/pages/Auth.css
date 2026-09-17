@@ -418,26 +418,6 @@
 }
 
 /* ═══════════════════════════════════════════════════════ */
-/*  DIVIDER                                                */
-/* ═══════════════════════════════════════════════════════ */
-.auth-divider {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: 22px 0 18px;
-  color: var(--text-muted);
-  font-size: 0.78rem;
-}
-
-.auth-divider::before,
-.auth-divider::after {
-  content: '';
-  flex: 1;
-  height: 1px;
-  background: var(--border-color);
-}
-
-/* ═══════════════════════════════════════════════════════ */
 /*  REGISTER NUDGE (Login page bottom)                    */
 /* ═══════════════════════════════════════════════════════ */
 .auth-nudge {

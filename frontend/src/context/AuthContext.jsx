@@ -45,6 +45,14 @@ export function AuthProvider({ children }) {
     return { success: false, message: result.message, error: result.error };
   }, []);
 
+  const loginWithGoogle = useCallback(async (credential) => {
+    const result = await authService.loginWithGoogle(credential);
+    if (result.success) {
+      setUser(result.user);
+    }
+    return result;
+  }, []);
+
   const loginWithData = useCallback(async (userData) => {
     const result = await authService.register(userData);
     if (result.success) {
@@ -61,7 +69,7 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, login, loginWithData, logout, isLoggedIn: !!user, isLoading }}
+      value={{ user, login, loginWithGoogle, loginWithData, logout, isLoggedIn: !!user, isLoading }}
     >
       {children}
     </AuthContext.Provider>

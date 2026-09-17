@@ -49,6 +49,27 @@ export const authService = {
     }
   },
 
+  async loginWithGoogle(credential) {
+    try {
+      const response = await api.post("/auth/google", { credential });
+
+      if (response.data?.token) {
+        sessionStorage.setItem("sc_token", response.data.token);
+      }
+      if (response.data?.user) {
+        sessionStorage.setItem("sc_user", JSON.stringify(response.data.user));
+      }
+
+      return { success: true, user: response.data?.user, message: response.data?.message };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.response?.data?.message || (error.request ? "Unable to connect to server" : "Google sign-in failed"),
+        error,
+      };
+    }
+  },
+
   /**
    * Register a new user
    */

@@ -53,9 +53,17 @@ app.get(
 
 const PORT = process.env.PORT || 5000;
 
-connectDB();
+const startServer = async () => {
+  try {
+    await connectDB();
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  } catch {
+    console.error("Server startup stopped because the database is unavailable.");
+    process.exit(1);
+  }
+};
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+startServer();
 

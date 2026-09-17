@@ -15,53 +15,56 @@ import ComplaintDetails from "./pages/ComplaintDetails";
 import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
+  const routes = (
+    <Routes>
+      {/* Public routes */}
+      <Route path="/" element={<Home />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/admin/login" element={<Login adminMode />} />
+      <Route path="/register" element={<Register />} />
+
+      {/* Protected routes — require login */}
+      <Route
+        path="/report"
+        element={
+          <ProtectedRoute>
+            <ReportComplaint />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/complaints"
+        element={
+          <ProtectedRoute>
+            <MyComplaints />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/complaints/:id"
+        element={
+          <ProtectedRoute>
+            <ComplaintDetails />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute requiredRole="admin">
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+    </Routes>
+  );
+
   return (
     <ThemeProvider>
       <AuthProvider>
         <BrowserRouter>
           <Navbar />
-
-        <Routes>
-          {/* Public routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/admin/login" element={<Login adminMode />} />
-          <Route path="/register" element={<Register />} />
-
-          {/* Protected routes — require login */}
-          <Route
-            path="/report"
-            element={
-              <ProtectedRoute>
-                <ReportComplaint />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/complaints"
-            element={
-              <ProtectedRoute>
-                <MyComplaints />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/complaints/:id"
-            element={
-              <ProtectedRoute>
-                <ComplaintDetails />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin"
-            element={
-              <ProtectedRoute requiredRole="admin">
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-        </Routes>
+          {routes}
       </BrowserRouter>
     </AuthProvider>
   </ThemeProvider>

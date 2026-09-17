@@ -62,7 +62,7 @@ function Register() {
       });
 
       if (loginResult.success) {
-        navigate("/complaints", { replace: true });
+        navigate("/", { replace: true });
       } else {
         // Registered OK but login failed — send to login page
         navigate("/login", { replace: true });
