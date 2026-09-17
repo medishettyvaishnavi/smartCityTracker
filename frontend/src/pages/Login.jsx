@@ -25,15 +25,29 @@ function Login({ adminMode = false }) {
   const onSubmit = async (data) => {
     setLoginError("");
     setIsSubmitting(true);
-    const result = await login(data.email, data.password);
-    setIsSubmitting(false);
-    if (result.success && adminMode && result.user?.role !== "admin") {
-      await logout();
-      setLoginError("This account does not have administrator access.");
-    } else if (result.success) {
-      navigate(from, { replace: true });
-    } else {
-      setLoginError(result.message);
+    try {
+      const result = await login(data.email, data.password);
+      if (result.success && adminMode && result.user?.role !== "admin") {
+        await logout();
+        setLoginError("This account does not have administrator access.");
+      } else if (result.success) {
+        navigate(from, { replace: true });
+      } else {
+        const error = result.error;
+        const message =
+          error?.response?.data?.message ||
+          result.message ||
+          (error?.request ? "Unable to connect to the server" : "Invalid email or password");
+        setLoginError(message);
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      const message =
+        error.response?.data?.message ||
+        (error.request ? "Unable to connect to the server" : "Something went wrong");
+      setLoginError(message);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 

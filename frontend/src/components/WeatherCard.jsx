@@ -17,7 +17,16 @@ function WeatherCard({ city }) {
         setWeather(data);
       } catch (error) {
         console.error("Weather error:", error);
-        setError("Unable to load weather");
+
+        if (error.response) {
+          setError(
+            error.response.data?.message || "Unable to fetch weather data"
+          );
+        } else if (error.request) {
+          setError("Unable to connect to the server");
+        } else {
+          setError("Something went wrong");
+        }
       } finally {
         setLoading(false);
       }
@@ -31,7 +40,11 @@ function WeatherCard({ city }) {
   }
 
   if (error) {
-    return <p>{error}</p>;
+    return (
+      <div className="weather-error">
+        <p>{error}</p>
+      </div>
+    );
   }
 
   if (!weather) {

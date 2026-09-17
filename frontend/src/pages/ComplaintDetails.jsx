@@ -60,7 +60,12 @@ function ComplaintDetails() {
       })
       .catch((err) => {
         if (isMounted) {
-          setError(err.message || "Failed to load complaint details");
+          const message =
+            err.response?.data?.message ||
+            (err.request
+              ? "Unable to connect to the server"
+              : err.message || "Failed to load complaint details");
+          setError(message);
           setLoading(false);
         }
       });
@@ -73,7 +78,7 @@ function ComplaintDetails() {
   useEffect(() => {
     if (user?.role === "admin") {
       adminService.getAdmins().then((data) => {
-        setAdmins(data || []);
+        setAdmins(data?.admins || (Array.isArray(data) ? data : []));
       }).catch(err => console.error("Failed to load admins", err));
     }
   }, [user]);
@@ -89,7 +94,10 @@ function ComplaintDetails() {
       setComplaint(updatedComplaint);
       setAssignSuccess(true);
     } catch (err) {
-      setActionError(err.message || "Failed to assign complaint.");
+      const message =
+        err.response?.data?.message ||
+        (err.request ? "Unable to connect to the server" : err.message || "Failed to assign complaint.");
+      setActionError(message);
     } finally {
       setAssigning(false);
     }
@@ -106,7 +114,10 @@ function ComplaintDetails() {
       await complaintService.deleteComplaint(id);
       navigate("/complaints", { replace: true });
     } catch (err) {
-      setActionError(err.message || "Failed to withdraw complaint. Please try again.");
+      const message =
+        err.response?.data?.message ||
+        (err.request ? "Unable to connect to the server" : err.message || "Failed to withdraw complaint. Please try again.");
+      setActionError(message);
       setWithdrawing(false);
     }
   };

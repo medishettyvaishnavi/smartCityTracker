@@ -67,9 +67,13 @@ function ReportComplaint() {
       });
       setCreatedComplaint(created);
     } catch (err) {
-      setSubmitError(
-        err.message || "Failed to submit complaint. Please check your connection and try again."
-      );
+      console.error("Complaint submission error:", err);
+      const message =
+        err.response?.data?.message ||
+        (err.request
+          ? "Unable to connect to the server"
+          : err.message || "Failed to submit complaint. Please check your connection and try again.");
+      setSubmitError(message);
     }
   };
 

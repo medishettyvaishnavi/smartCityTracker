@@ -42,7 +42,7 @@ export function AuthProvider({ children }) {
       setUser(mergedUser);
       return { success: true, user: mergedUser };
     }
-    return { success: false, message: result.message };
+    return { success: false, message: result.message, error: result.error };
   }, []);
 
   const loginWithData = useCallback(async (userData) => {
@@ -51,7 +51,7 @@ export function AuthProvider({ children }) {
       setUser(result.user);
       return { success: true };
     }
-    return { success: false, message: result.message };
+    return { success: false, message: result.message, error: result.error };
   }, []);
 
   const logout = useCallback(async () => {

@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { Spinner } from "../components/common";
+import { Alert, Spinner } from "../components/common";
 import authService from "../services/authService";
 import "./Auth.css";
 
@@ -34,32 +34,45 @@ function Register() {
   const onSubmit = async (data) => {
     setServerError("");
 
-    const registerResult = await authService.register({
-      name: data.fullName,
-      email: data.email,
-      password: data.password,
-      city: data.city,
-      phone: data.phone,
-      pincode: data.pincode,
-    });
+    try {
+      const registerResult = await authService.register({
+        name: data.fullName,
+        email: data.email,
+        password: data.password,
+        city: data.city,
+        phone: data.phone,
+        pincode: data.pincode,
+      });
 
-    if (!registerResult.success) {
-      setServerError(registerResult.message || "Registration failed. Please try again.");
-      return;
-    }
+      if (!registerResult.success) {
+        const error = registerResult.error;
+        const message =
+          error?.response?.data?.message ||
+          registerResult.message ||
+          (error?.request ? "Unable to connect to the server" : "Registration failed. Please try again.");
+        setServerError(message);
+        return;
+      }
 
-    // Register doesn't return a token — auto-login to get one, passing user profile fields
-    const loginResult = await login(data.email, data.password, {
-      city: data.city,
-      phone: data.phone,
-      pincode: data.pincode,
-    });
+      // Register doesn't return a token — auto-login to get one, passing user profile fields
+      const loginResult = await login(data.email, data.password, {
+        city: data.city,
+        phone: data.phone,
+        pincode: data.pincode,
+      });
 
-    if (loginResult.success) {
-      navigate("/complaints", { replace: true });
-    } else {
-      // Registered OK but login failed — send to login page
-      navigate("/login", { replace: true });
+      if (loginResult.success) {
+        navigate("/complaints", { replace: true });
+      } else {
+        // Registered OK but login failed — send to login page
+        navigate("/login", { replace: true });
+      }
+    } catch (error) {
+      console.error("Registration error:", error);
+      const message =
+        error.response?.data?.message ||
+        (error.request ? "Unable to connect to the server" : "Something went wrong. Please try again.");
+      setServerError(message);
     }
   };
 
@@ -315,9 +328,9 @@ function Register() {
 
             {/* Server error */}
             {serverError && (
-              <p className="auth-error" style={{ textAlign: "center", marginBottom: "0.5rem" }}>
-                ⚠ {serverError}
-              </p>
+              <div style={{ marginBottom: "1rem" }}>
+                <Alert type="error" message={serverError} onClose={() => setServerError("")} />
+              </div>
             )}
 
             {/* Submit */}

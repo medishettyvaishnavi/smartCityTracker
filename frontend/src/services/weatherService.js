@@ -2,8 +2,12 @@ import api from "./api";
 
 const weatherService = {
   async getWeather(city) {
+    if (!city || !city.trim()) {
+      throw new Error("City name is required");
+    }
+
     const response = await api.get("/weather", {
-      params: { city },
+      params: { city: city.trim() },
     });
 
     const data = response.data;

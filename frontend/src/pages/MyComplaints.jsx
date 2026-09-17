@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import complaintService from "../services/complaintService";
-import { Badge, Spinner } from "../components/common";
+import { Alert, Badge, Spinner } from "../components/common";
 import "./MyComplaints.css";
 
 const STATUS_META = {
@@ -30,10 +30,12 @@ function MyComplaints() {
   const [complaints, setComplaints] = useState([]);
   const [stats, setStats] = useState({ total: 0, pending: 0, inProgress: 0, resolved: 0 });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
   // Load complaints and stats via complaintService
   const loadData = useCallback(async () => {
     setLoading(true);
+    setError("");
     try {
       const [list, statistics] = await Promise.all([
         complaintService.getComplaints({ status: activeTab, search, sortBy }),
@@ -55,6 +57,12 @@ function MyComplaints() {
       }
     } catch (err) {
       console.error("Failed to load complaints:", err);
+      const message =
+        err.response?.data?.message ||
+        (err.request
+          ? "Unable to connect to the server"
+          : err.message || "Failed to load complaints");
+      setError(message);
       setComplaints([]);
     } finally {
       setLoading(false);
@@ -121,6 +129,13 @@ function MyComplaints() {
             <span className="mc-sum-lbl">Pending</span>
           </div>
         </div>
+
+        {/* ── Error Banner ────────────────────────────── */}
+        {error && (
+          <div style={{ marginBottom: "20px" }}>
+            <Alert type="error" message={error} onClose={() => setError("")} />
+          </div>
+        )}
 
         {/* ── Controls ────────────────────────────────── */}
         <div className="mc-controls">

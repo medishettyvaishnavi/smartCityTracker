@@ -35,9 +35,16 @@ export const authService = {
         message: response.data?.message,
       };
     } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        (error.request
+          ? "Unable to connect to the server"
+          : error.message || "Login failed");
+
       return {
         success: false,
-        message: error.message || "Login failed",
+        message,
+        error,
       };
     }
   },
@@ -58,9 +65,16 @@ export const authService = {
         message: response.data?.message,
       };
     } catch (error) {
+      const message =
+        error.response?.data?.message ||
+        (error.request
+          ? "Unable to connect to the server"
+          : error.message || "Registration failed");
+
       return {
         success: false,
-        message: error.message || "Registration failed",
+        message,
+        error,
       };
     }
   },
