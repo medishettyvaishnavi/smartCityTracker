@@ -4,8 +4,32 @@ import User from "../models/User.js";
 // GET /api/admin/complaints
 export const getAllComplaints = async (req, res) => {
   try {
-    const complaints = await Complaint.find()
+    const { status, category, priority, search } = req.query;
+    const query = {};
+
+    if (status && status !== "all") {
+      query.status = status;
+    }
+
+    if (category && category !== "all") {
+      query.category = category;
+    }
+
+    if (priority && priority !== "all") {
+      query.priority = priority;
+    }
+
+    if (search && search.trim()) {
+      const searchTerm = search.trim();
+      query.$or = [
+        { title: { $regex: searchTerm, $options: "i" } },
+        { "location.address": { $regex: searchTerm, $options: "i" } },
+      ];
+    }
+
+    const complaints = await Complaint.find(query)
       .populate("user", "name email")
+      .populate("assignedTo", "name email")
       .sort({ createdAt: -1 });
 
     res.status(200).json({

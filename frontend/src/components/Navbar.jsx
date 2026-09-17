@@ -1,4 +1,4 @@
-import { NavLink, Link, useNavigate } from "react-router-dom";
+import { NavLink, Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
@@ -13,6 +13,7 @@ const AUTH_NAV_LINKS = [
 function Navbar() {
   const { isLoggedIn, user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
+  const location = useLocation();
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -38,6 +39,8 @@ function Navbar() {
       })
     : null;
 
+  const isAboutActive = location.pathname === "/" && location.hash === "#about";
+
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -55,6 +58,19 @@ function Navbar() {
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
   }, []);
+
+  useEffect(() => {
+    if (location.pathname !== "/" || location.hash !== "#about") return;
+
+    const frame = window.requestAnimationFrame(() => {
+      document.getElementById("about")?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [location.pathname, location.hash]);
 
   const handleLinkClick = () => {
     setMenuOpen(false);
@@ -85,23 +101,28 @@ function Navbar() {
           </span>
         </Link>
 
-        {/* ── Desktop Nav Links (logged-in only) ────── */}
-        {isLoggedIn && (
-          <div className="nav-links">
-            {AUTH_NAV_LINKS.map(({ to, label, exact }) => (
-              <NavLink
-                key={to}
-                to={to}
-                end={exact}
-                className={({ isActive }) =>
-                  `nav-link ${isActive ? "nav-link-active" : ""}`
-                }
-              >
-                {label}
-              </NavLink>
-            ))}
-          </div>
-        )}
+        {/* ── Desktop Nav Links ──────────────────────── */}
+        <div className="nav-links">
+          {isLoggedIn && AUTH_NAV_LINKS.map(({ to, label, exact }) => (
+            <NavLink
+              key={to}
+              to={to}
+              end={exact}
+              className={({ isActive }) =>
+                `nav-link ${isActive ? "nav-link-active" : ""}`
+              }
+            >
+              {label}
+            </NavLink>
+          ))}
+          <Link
+            to="/#about"
+            className={`nav-link ${isAboutActive ? "nav-link-active" : ""}`}
+            onClick={handleLinkClick}
+          >
+            About
+          </Link>
+        </div>
 
         {/* ── Right Side ────────────────────────────── */}
         <div className="nav-right">
@@ -206,6 +227,13 @@ function Navbar() {
           </button>
         </div>
         <div className="nav-mobile-divider" />
+        <Link
+          to="/#about"
+          className={`nav-mobile-link ${isAboutActive ? "nav-mobile-link-active" : ""}`}
+          onClick={handleLinkClick}
+        >
+          About
+        </Link>
 
         {isLoggedIn ? (
           <>

@@ -66,8 +66,44 @@ const STATUS_META = {
 
 function Home() {
   const { isLoggedIn, user } = useAuth();
+  const weatherCity =
+    user?.city?.trim() || user?.location?.city?.trim() || "Hyderabad";
+
   return (
     <div className="home-root">
+
+      {/* ── Auth Prompt / Welcome Banner ─────────────── */}
+      {isLoggedIn ? (
+        <section className="welcome-banner">
+          <div className="welcome-inner">
+            <div className="welcome-left">
+              <div>
+                <p className="welcome-title">Welcome back, {user?.name?.split(" ")[0]}! 👋</p>
+                <p className="welcome-sub">You're signed in as {user?.email}</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : (
+        <section className="auth-prompt">
+          <div className="auth-prompt-inner">
+            <div className="auth-prompt-left">
+              <span className="auth-prompt-icon">🔐</span>
+              <div>
+                <p className="auth-prompt-title">Don't have an account yet?</p>
+                <p className="auth-prompt-sub">Register for free to report issues and track resolutions.</p>
+              </div>
+            </div>
+            <div className="auth-prompt-actions">
+              <Link to="/login" className="auth-login-btn">Log In</Link>
+              <span className="auth-prompt-divider">or</span>
+              <Link to="/register" className="auth-register-btn">
+                Create Free Account →
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── Hero ─────────────────────────────────────── */}
       <section className="hero">
@@ -112,65 +148,26 @@ function Home() {
 
         {/* Floating cards visual */}
         <div className="hero-visual">
-          <div className="hv-card hv-card-1">
-            <span className="hv-icon">🛣️</span>
-            <span>Road Damaged</span>
-            <span className="hv-tag hv-tag-red">Pending</span>
-          </div>
-          <div className="hv-card hv-card-2">
-            <span className="hv-icon">💧</span>
-            <span>Water Leak</span>
-            <span className="hv-tag hv-tag-blue">In Progress</span>
-          </div>
-          <div className="hv-card hv-card-3">
-            <span className="hv-icon">💡</span>
-            <span>Street Light</span>
-            <span className="hv-tag hv-tag-green">Resolved ✓</span>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Auth Prompt / Welcome Banner ─────────────── */}
-      {isLoggedIn ? (
-        <section className="welcome-banner">
-          <div className="welcome-inner">
-            <div className="welcome-left">
-              <div className="welcome-avatar">{user?.initials}</div>
-              <div>
-                <p className="welcome-title">Welcome back, {user?.name?.split(" ")[0]}! 👋</p>
-                <p className="welcome-sub">You're signed in as {user?.email}</p>
-              </div>
+          <div className="hero-issue-cards">
+            <div className="hv-card hv-card-1">
+              <span className="hv-icon">🛣️</span>
+              <span>Road Damaged</span>
+              <span className="hv-tag hv-tag-red">Pending</span>
             </div>
-            <div className="welcome-actions">
-              <Link to="/report" className="auth-register-btn">📢 Report an Issue</Link>
-              <Link to="/complaints" className="auth-login-btn">My Complaints</Link>
+            <div className="hv-card hv-card-2">
+              <span className="hv-icon">💧</span>
+              <span>Water Leak</span>
+              <span className="hv-tag hv-tag-blue">In Progress</span>
+            </div>
+            <div className="hv-card hv-card-3">
+              <span className="hv-icon">💡</span>
+              <span>Street Light</span>
+              <span className="hv-tag hv-tag-green">Resolved ✓</span>
             </div>
           </div>
-        </section>
-      ) : (
-        <section className="auth-prompt">
-          <div className="auth-prompt-inner">
-            <div className="auth-prompt-left">
-              <span className="auth-prompt-icon">🔐</span>
-              <div>
-                <p className="auth-prompt-title">Don't have an account yet?</p>
-                <p className="auth-prompt-sub">Register for free to report issues and track resolutions.</p>
-              </div>
-            </div>
-            <div className="auth-prompt-actions">
-              <Link to="/login" className="auth-login-btn">Log In</Link>
-              <span className="auth-prompt-divider">or</span>
-              <Link to="/register" className="auth-register-btn">
-                Create Free Account →
-              </Link>
-            </div>
+          <div className="hero-weather-card">
+            <WeatherCard city={weatherCity} />
           </div>
-        </section>
-      )}
-
-      <section className="section">
-        <div className="section-inner">
-          <WeatherCard city="Hyderabad" />
         </div>
       </section>
 
@@ -186,7 +183,7 @@ function Home() {
       </section>
 
       {/* ── Features ─────────────────────────────────── */}
-      <section className="section">
+      <section className="section" id="about">
         <div className="section-inner">
           <div className="section-header">
             <h2 className="section-title">Everything You Need</h2>

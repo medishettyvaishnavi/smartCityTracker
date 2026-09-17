@@ -14,7 +14,7 @@ function Login({ adminMode = false }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // If redirected here from a protected page, go back there after login
-  const from = location.state?.from || (adminMode ? "/admin" : "/complaints");
+  const from = location.state?.from || (adminMode ? "/admin" : "/");
 
   const {
     register,
@@ -82,7 +82,6 @@ function Login({ adminMode = false }) {
         {loginError && (
           <Alert type="error" message={loginError} onClose={() => setLoginError("")} />
         )}
-
         <form className="auth-form" onSubmit={handleSubmit(onSubmit)} noValidate>
 
           {/* Email */}
@@ -152,15 +151,6 @@ function Login({ adminMode = false }) {
           </button>
 
         </form>
-
-        {/* Hint */}
-        {!adminMode && <div className="auth-hint-box">
-          <span className="auth-hint-icon">💡</span>
-          <span>Test: <strong>test@smartcity.com</strong> / <strong>password123</strong></span>
-        </div>}
-
-        {/* Divider */}
-        <div className="auth-divider"><span>or</span></div>
 
         {/* Register nudge */}
         {!adminMode && <div className="auth-nudge">

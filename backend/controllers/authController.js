@@ -1,6 +1,26 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
+import crypto from "node:crypto";
+import { OAuth2Client } from "google-auth-library";
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+const createAuthResponse = (user, token) => ({
+  message: "Login successful",
+  token,
+  user: {
+    id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    location: user.location || { city: user.city || "" },
+    city: user.city || user.location?.city || "",
+    phone: user.phone || "",
+    pincode: user.pincode || user.location?.pincode || "",
+    joinedAt: user.createdAt,
+  },
+});
 
 // ==================== REGISTER ====================
 
@@ -254,5 +274,45 @@ export const updateProfile = async (req, res) => {
       message: "Failed to update profile",
       error: error.message,
     });
+  }
+};
+
+export const loginWithGoogle = async (req, res) => {
+  try {
+    const { credential } = req.body;
+    if (!credential) {
+      return res.status(400).json({ message: "Google credential is required" });
+    }
+    if (!process.env.GOOGLE_CLIENT_ID) {
+      return res.status(503).json({ message: "Google sign-in is not configured" });
+    }
+
+    const ticket = await googleClient.verifyIdToken({
+      idToken: credential,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+    const payload = ticket.getPayload();
+    if (!payload?.email || !payload.email_verified) {
+      return res.status(401).json({ message: "Google account email could not be verified" });
+    }
+
+    let user = await User.findOne({ email: payload.email.toLowerCase() });
+    if (user?.role === "admin") {
+      return res.status(403).json({ message: "Use administrator sign in for admin accounts" });
+    }
+    if (!user) {
+      const name = payload.name?.trim() || payload.email.split("@")[0];
+      user = await User.create({
+        name,
+        email: payload.email.toLowerCase(),
+        password: await bcrypt.hash(crypto.randomBytes(32).toString("hex"), 10),
+        role: "citizen",
+      });
+    }
+
+    const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: "1d" });
+    res.status(200).json(createAuthResponse(user, token));
+  } catch (error) {
+    res.status(401).json({ message: "Google sign-in failed", error: error.message });
   }
 };
