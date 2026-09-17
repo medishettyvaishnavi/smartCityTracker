@@ -147,9 +147,9 @@ GET http://localhost:5000/api/weather?city=asdfghjkl12345
 
 ###
 POST http://localhost:5000/api/assistant/query
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYTk3ZTI5NzEyMTljNTRkZjY5ZTAyYiIsInJvbGUiOiJjaXRpemVuIiwiaWF0IjoxNzg5NjcxOTkzLCJleHAiOjE3ODk3NTgzOTN9.1Xbqx_S8ohq0N_1hNTlLHSSfAovlZS-p9Vz33sRRmxM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWE5MTk2MDc4NjM2YTkwMzlkMDk3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4OTY3NTE0NywiZXhwIjoxNzg5NzYxNTQ3fQ.V9lxoS9OwG-EzWXLYVP3Qdat5CcNPbaWBFe6BSS5Sqs
 Content-Type: application/json
 
 {
-  "query": "What is my complaint status?"
+  "query": "How can I report a garbage problem?"
 }
