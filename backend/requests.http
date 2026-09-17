@@ -144,3 +144,12 @@ GET http://localhost:5000/api/weather
 
 ###
 GET http://localhost:5000/api/weather?city=asdfghjkl12345
+
+###
+POST http://localhost:5000/api/assistant/query
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYTk3ZTI5NzEyMTljNTRkZjY5ZTAyYiIsInJvbGUiOiJjaXRpemVuIiwiaWF0IjoxNzg5NjcxOTkzLCJleHAiOjE3ODk3NTgzOTN9.1Xbqx_S8ohq0N_1hNTlLHSSfAovlZS-p9Vz33sRRmxM
+Content-Type: application/json
+
+{
+  "query": "What is my complaint status?"
+}

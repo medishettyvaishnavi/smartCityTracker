@@ -1,5 +1,5 @@
 import { useState } from "react";
-
+import assistantService from "../services/assistantService";
 function Assistant() {
   const [message, setMessage] = useState("");
   const [messages, setMessages] = useState([
@@ -9,27 +9,47 @@ function Assistant() {
     },
   ]);
 
-  const handleSend = () => {
-    if (!message.trim()) return;
+const handleSend = async () => {
+  if (!message.trim()) return;
 
-    const userMessage = {
-      sender: "user",
-      text: message,
-    };
+  const userMessage = {
+    sender: "user",
+    text: message,
+  };
+
+  setMessages((prev) => [...prev, userMessage]);
+
+  const currentMessage = message;
+  setMessage("");
+
+  try {
+    const data = await assistantService.query(currentMessage);
 
     const assistantMessage = {
       sender: "assistant",
-      text: "I'm processing your request...",
+      text: data.answer,
     };
 
     setMessages((prev) => [
       ...prev,
-      userMessage,
       assistantMessage,
     ]);
+  } catch (error) {
+    console.error("Assistant error:", error);
 
-    setMessage("");
-  };
+    const assistantMessage = {
+      sender: "assistant",
+      text:
+        error.response?.data?.message ||
+        "Sorry, something went wrong.",
+    };
+
+    setMessages((prev) => [
+      ...prev,
+      assistantMessage,
+    ]);
+  }
+};
 
   return (
     <div className="container py-4">
