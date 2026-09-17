@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import complaintService from "../services/complaintService";
+import adminService from "../services/adminService";
+import { useAuth } from "../context/AuthContext";
 import { Badge, Spinner, Alert } from "../components/common";
 import "./ComplaintDetails.css";
 
@@ -37,6 +39,12 @@ function ComplaintDetails() {
   const [withdrawing, setWithdrawing] = useState(false);
   const [actionError, setActionError] = useState(null);
 
+  const { user } = useAuth();
+  const [admins, setAdmins] = useState([]);
+  const [assigning, setAssigning] = useState(false);
+  const [selectedAdmin, setSelectedAdmin] = useState("");
+  const [assignSuccess, setAssignSuccess] = useState(false);
+
   useEffect(() => {
     let isMounted = true;
     setLoading(true);
@@ -61,6 +69,31 @@ function ComplaintDetails() {
       isMounted = false;
     };
   }, [id]);
+
+  useEffect(() => {
+    if (user?.role === "admin") {
+      adminService.getAdmins().then((data) => {
+        setAdmins(data || []);
+      }).catch(err => console.error("Failed to load admins", err));
+    }
+  }, [user]);
+
+  const handleAssign = async () => {
+    if (!selectedAdmin) return;
+    setAssigning(true);
+    setActionError(null);
+    setAssignSuccess(false);
+    try {
+      await adminService.assignComplaint(id, selectedAdmin);
+      const updatedComplaint = await complaintService.getComplaintById(id);
+      setComplaint(updatedComplaint);
+      setAssignSuccess(true);
+    } catch (err) {
+      setActionError(err.message || "Failed to assign complaint.");
+    } finally {
+      setAssigning(false);
+    }
+  };
 
   const handleWithdraw = async () => {
     if (!window.confirm("Are you sure you want to withdraw this complaint? This cannot be undone.")) {
@@ -240,6 +273,35 @@ function ComplaintDetails() {
                 )}
               </div>
             </div>
+
+            {/* Admin Assignment Block */}
+            {user?.role === "admin" && (
+              <div className="cd-section" style={{ marginTop: "24px" }}>
+                <h2 className="cd-section-title">👥 Assign Complaint</h2>
+                {assignSuccess && <Alert type="success" message="Complaint assigned successfully." style={{ marginBottom: "16px" }} />}
+                <div style={{ display: "flex", gap: "12px", alignItems: "center" }}>
+                  <select 
+                    className="cd-input" 
+                    value={selectedAdmin || complaint?.assignedTo || ""}
+                    onChange={(e) => setSelectedAdmin(e.target.value)}
+                    style={{ flex: 1, padding: "8px", borderRadius: "6px", border: "1px solid var(--border-color)" }}
+                  >
+                    <option value="" disabled>Select an Admin</option>
+                    {admins.map(a => (
+                      <option key={a._id || a.id} value={a._id || a.id}>{a.name} ({a.email})</option>
+                    ))}
+                  </select>
+                  <button 
+                    className="cd-back-btn" 
+                    onClick={handleAssign}
+                    disabled={assigning || !selectedAdmin}
+                    style={{ backgroundColor: "var(--primary-color)", color: "white", border: "none", cursor: "pointer" }}
+                  >
+                    {assigning ? <Spinner size="sm" color="white" /> : "Assign"}
+                  </button>
+                </div>
+              </div>
+            )}
 
           </div>
 

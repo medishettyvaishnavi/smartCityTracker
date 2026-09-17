@@ -488,6 +488,20 @@
   margin: 0;
 }
 
+.auth-admin-link {
+  display: block;
+  margin-top: 18px;
+  color: var(--pastel-accent);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+  text-decoration: none;
+}
+
+.auth-admin-link:hover {
+  text-decoration: underline;
+}
+
 /* ═══════════════════════════════════════════════════════ */
 /*  SIGN IN LINK (Register page bottom)                   */
 /* ═══════════════════════════════════════════════════════ */

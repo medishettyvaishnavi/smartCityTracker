@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
 import complaintRoutes from "./routes/complaintRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 import authMiddleware from "./middleware/authMiddleware.js";
 
 dotenv.config();
@@ -15,6 +16,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/complaints", complaintRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.get("/api/test", (req, res) => {
   res.json({

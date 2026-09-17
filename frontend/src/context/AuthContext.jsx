@@ -40,7 +40,7 @@ export function AuthProvider({ children }) {
         sessionStorage.setItem("sc_user", JSON.stringify(mergedUser));
       }
       setUser(mergedUser);
-      return { success: true };
+      return { success: true, user: mergedUser };
     }
     return { success: false, message: result.message };
   }, []);
