@@ -12,7 +12,66 @@ const createGeminiClient = () => {
   });
 };
 
+const isGeminiUnavailable = (error) =>
+  error?.status === 429 ||
+  error?.status === 503 ||
+  error?.response?.status === 429 ||
+  error?.response?.status === 503 ||
+  error?.code === 429 ||
+  error?.code === 503;
+
+const inferIntentWithoutGemini = (query) => {
+  const normalizedQuery = query.toLowerCase();
+
+  if (
+    normalizedQuery.includes("weather") ||
+    normalizedQuery.includes("temperature") ||
+    normalizedQuery.includes("forecast") ||
+    normalizedQuery.includes("raining")
+  ) {
+    return "GET_WEATHER";
+  }
+
+  if (
+    normalizedQuery.includes("detail") ||
+    normalizedQuery.includes("tell me about")
+  ) {
+    return "GET_COMPLAINT_DETAILS";
+  }
+
+  if (normalizedQuery.includes("status")) {
+    return "GET_COMPLAINT_STATUS";
+  }
+
+  if (
+    normalizedQuery.includes("complaint") ||
+    normalizedQuery.includes("issue")
+  ) {
+    return "GET_MY_COMPLAINTS";
+  }
+
+  return "GENERAL_QUESTION";
+};
+
 export const detectIntent = async (query) => {
+  const normalizedQuery = query.toLowerCase();
+
+  if (
+    normalizedQuery.includes("weather") ||
+    normalizedQuery.includes("temperature") ||
+    normalizedQuery.includes("forecast") ||
+    normalizedQuery.includes("raining")
+  ) {
+    return "GET_WEATHER";
+  }
+
+  if (
+    normalizedQuery.includes("detail") ||
+    normalizedQuery.includes("tell me about")
+  ) {
+    return "GET_COMPLAINT_DETAILS";
+  }
+
   const ai = createGeminiClient();
 
   const prompt = `
@@ -33,12 +92,17 @@ Return ONLY the intent name.
 Do not provide an explanation.
 `;
 
-  const response = await ai.models.generateContent({
-    model: "gemini-3.6-flash",
-    contents: prompt,
-  });
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-3.6-flash",
+      contents: prompt,
+    });
 
-  return response.text.trim();
+    return response.text.trim();
+  } catch (error) {
+    if (!isGeminiUnavailable(error)) throw error;
+    return inferIntentWithoutGemini(query);
+  }
 };
 
 export const generateNaturalResponse = async (query, context) => {
