@@ -1,7 +1,12 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import assistantService from "../services/assistantService";
+import "./Assistant.css";
+
 function Assistant() {
   const [message, setMessage] = useState("");
+  const [isListening, setIsListening] = useState(false);
+  const [voiceError, setVoiceError] = useState("");
+  const recognitionRef = useRef(null);
   const [messages, setMessages] = useState([
     {
       sender: "assistant",
@@ -9,7 +14,82 @@ function Assistant() {
     },
   ]);
 
-const handleSend = async () => {
+  const speakText = (text) => {
+    if (!("speechSynthesis" in window)) {
+      alert("Text-to-speech is not supported in this browser.");
+      return;
+    }
+
+    window.speechSynthesis.cancel();
+
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.lang = "en-IN";
+    utterance.rate = 1;
+    utterance.pitch = 1;
+
+    window.speechSynthesis.speak(utterance);
+  };
+
+  useEffect(
+    () => () => {
+      recognitionRef.current?.stop();
+      window.speechSynthesis?.cancel();
+    },
+    []
+  );
+
+  const handleVoiceInput = () => {
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
+
+    if (!SpeechRecognition) {
+      setVoiceError("Voice input is not supported in this browser.");
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current?.stop();
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = "en-IN";
+    recognition.continuous = false;
+    recognition.interimResults = false;
+
+    recognition.onstart = () => {
+      setVoiceError("");
+      setIsListening(true);
+    };
+
+    recognition.onresult = (event) => {
+      const transcript = Array.from(event.results)
+        .map((result) => result[0].transcript)
+        .join(" ");
+      setMessage((currentMessage) =>
+        `${currentMessage}${currentMessage ? " " : ""}${transcript}`
+      );
+    };
+
+    recognition.onerror = (event) => {
+      setIsListening(false);
+      setVoiceError(
+        event.error === "not-allowed"
+          ? "Microphone permission was denied."
+          : "Voice input could not be started. Please try again."
+      );
+    };
+
+    recognition.onend = () => {
+      setIsListening(false);
+      recognitionRef.current = null;
+    };
+
+    recognitionRef.current = recognition;
+    recognition.start();
+  };
+
+  const handleSend = async () => {
   if (!message.trim()) return;
 
   const userMessage = {
@@ -23,7 +103,11 @@ const handleSend = async () => {
   setMessage("");
 
   try {
-    const data = await assistantService.query(currentMessage);
+    const history = messages.map((chatMessage) => ({
+      role: chatMessage.sender === "user" ? "user" : "assistant",
+      content: chatMessage.text,
+    }));
+    const data = await assistantService.query(currentMessage, history);
 
     const assistantMessage = {
       sender: "assistant",
@@ -34,6 +118,7 @@ const handleSend = async () => {
       ...prev,
       assistantMessage,
     ]);
+    speakText(data.answer);
   } catch (error) {
     console.error("Assistant error:", error);
 
@@ -96,6 +181,7 @@ const handleSend = async () => {
 
         {/* Input */}
         <div className="card-footer">
+          {voiceError && <div className="assistant-voice-error">{voiceError}</div>}
           <div className="input-group">
 
             <input
@@ -110,6 +196,16 @@ const handleSend = async () => {
                 }
               }}
             />
+
+            <button
+              type="button"
+              className={`btn assistant-mic-button ${isListening ? "is-listening" : ""}`}
+              onClick={handleVoiceInput}
+              aria-label={isListening ? "Stop voice input" : "Start voice input"}
+              title={isListening ? "Stop voice input" : "Speak your message"}
+            >
+              {isListening ? "Stop" : "Mic"}
+            </button>
 
             <button
               className="btn btn-primary"
