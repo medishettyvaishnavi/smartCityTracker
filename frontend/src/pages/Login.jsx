@@ -5,16 +5,16 @@ import { useAuth } from "../context/AuthContext";
 import { Alert, Spinner } from "../components/common";
 import "./Auth.css";
 
-function Login() {
+function Login({ adminMode = false }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const { login } = useAuth();
+  const { login, logout } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // If redirected here from a protected page, go back there after login
-  const from = location.state?.from || "/complaints";
+  const from = location.state?.from || (adminMode ? "/admin" : "/complaints");
 
   const {
     register,
@@ -27,7 +27,10 @@ function Login() {
     setIsSubmitting(true);
     const result = await login(data.email, data.password);
     setIsSubmitting(false);
-    if (result.success) {
+    if (result.success && adminMode && result.user?.role !== "admin") {
+      await logout();
+      setLoginError("This account does not have administrator access.");
+    } else if (result.success) {
       navigate(from, { replace: true });
     } else {
       setLoginError(result.message);
@@ -55,8 +58,10 @@ function Login() {
 
         {/* Heading */}
         <div className="auth-heading">
-          <h1 className="auth-title">Welcome back</h1>
-          <p className="auth-subtitle">Sign in to track and manage your complaints</p>
+          <h1 className="auth-title">{adminMode ? "Admin sign in" : "Welcome back"}</h1>
+          <p className="auth-subtitle">
+            {adminMode ? "Access the complaint management workspace" : "Sign in to track and manage your complaints"}
+          </p>
         </div>
 
         {/* Error banner */}
@@ -135,22 +140,24 @@ function Login() {
         </form>
 
         {/* Hint */}
-        <div className="auth-hint-box">
+        {!adminMode && <div className="auth-hint-box">
           <span className="auth-hint-icon">💡</span>
           <span>Test: <strong>test@smartcity.com</strong> / <strong>password123</strong></span>
-        </div>
+        </div>}
 
         {/* Divider */}
         <div className="auth-divider"><span>or</span></div>
 
         {/* Register nudge */}
-        <div className="auth-nudge">
+        {!adminMode && <div className="auth-nudge">
           <p className="auth-nudge-text">Don't have an account?</p>
           <Link to="/register" className="auth-nudge-btn">
             Create a Free Account
           </Link>
           <p className="auth-nudge-hint">Join thousands of citizens improving their city.</p>
-        </div>
+        </div>}
+
+        {!adminMode && <Link to="/admin/login" className="auth-admin-link">Administrator sign in</Link>}
 
       </div>
     </div>

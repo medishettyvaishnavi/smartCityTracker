@@ -22,6 +22,13 @@ export const API_ENDPOINTS = {
   CATEGORIES: {
     LIST: "/categories",
   },
+  ADMIN: {
+    COMPLAINTS: "/admin/complaints",
+    ADMINS: "/admin/admins",
+    STATS: "/admin/stats",
+    UPDATE_STATUS: (id) => `/admin/complaints/${id}/status`,
+    ASSIGN: (id) => `/admin/complaints/${id}/assign`,
+  },
 };
 
 /**

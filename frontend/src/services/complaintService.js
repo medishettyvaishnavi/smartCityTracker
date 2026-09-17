@@ -93,7 +93,11 @@ export function normalizeComplaint(c) {
  * Map a list of raw complaints
  */
 export function normalizeComplaints(list) {
-  if (!Array.isArray(list)) return [];
+  if (!Array.isArray(list)) {
+    if (Array.isArray(list?.complaints)) return list.complaints.map(normalizeComplaint).filter(Boolean);
+    if (Array.isArray(list?.data)) return list.data.map(normalizeComplaint).filter(Boolean);
+    return [];
+  }
   return list.map(normalizeComplaint).filter(Boolean);
 }
 
@@ -120,7 +124,11 @@ export const complaintService = {
 
       // Backend returns: { count, complaints: [...] }
       const raw = response.data?.complaints ?? response.data?.data ?? response.data;
-      const list = Array.isArray(raw) ? raw : [];
+      const list = Array.isArray(raw)
+        ? raw
+        : Array.isArray(raw?.complaints)
+        ? raw.complaints
+        : [];
 
       return normalizeComplaints(list);
     } catch (err) {
@@ -128,7 +136,8 @@ export const complaintService = {
 
       // Fallback to local mock data if offline or network error
       await new Promise((r) => setTimeout(r, 200));
-      let list = [...getStoredComplaints()];
+      const rawStored = getStoredComplaints();
+      let list = Array.isArray(rawStored) ? [...rawStored] : [];
 
       if (status && status !== "all") {
         list = list.filter((c) => c.status === status);

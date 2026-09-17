@@ -155,7 +155,8 @@ export function getStoredComplaints() {
       sessionStorage.setItem(COMPLAINTS_STORAGE_KEY, JSON.stringify(INITIAL_MOCK_COMPLAINTS));
       return INITIAL_MOCK_COMPLAINTS;
     }
-    return JSON.parse(raw);
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : INITIAL_MOCK_COMPLAINTS;
   } catch {
     return INITIAL_MOCK_COMPLAINTS;
   }
