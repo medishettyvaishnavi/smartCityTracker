@@ -7,7 +7,6 @@ import complaintRoutes from "./routes/complaintRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
 import authMiddleware from "./middleware/authMiddleware.js";
 import adminMiddleware from "./middleware/adminMiddleware.js";
-import adminRoutes from "./routes/adminRoutes.js";
 
 dotenv.config();
 
@@ -33,14 +32,6 @@ app.get("/api/protected", authMiddleware, (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 5000;
-
-connectDB();
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
-
 app.get(
   "/api/admin/test",
   authMiddleware,
@@ -53,4 +44,10 @@ app.get(
   }
 );
 
-app.use("/api/admin", adminRoutes);
+const PORT = process.env.PORT || 5000;
+
+connectDB();
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
