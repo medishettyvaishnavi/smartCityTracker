@@ -39,10 +39,23 @@ function MyComplaints() {
         complaintService.getComplaints({ status: activeTab, search, sortBy }),
         complaintService.getComplaintStats(),
       ]);
-      setComplaints(list);
-      setStats(statistics);
+
+      const safeList = Array.isArray(list)
+        ? list
+        : Array.isArray(list?.complaints)
+        ? list.complaints
+        : Array.isArray(list?.data)
+        ? list.data
+        : [];
+
+      setComplaints(safeList);
+
+      if (statistics && typeof statistics === "object") {
+        setStats(statistics);
+      }
     } catch (err) {
       console.error("Failed to load complaints:", err);
+      setComplaints([]);
     } finally {
       setLoading(false);
     }
@@ -52,11 +65,17 @@ function MyComplaints() {
     loadData();
   }, [loadData]);
 
+  const complaintList = Array.isArray(complaints)
+    ? complaints
+    : Array.isArray(complaints?.complaints)
+    ? complaints.complaints
+    : [];
+
   const tabs = [
-    { key: "all",         label: "All",         count: stats.total },
-    { key: "pending",     label: "Pending",     count: stats.pending },
-    { key: "in-progress", label: "In Progress", count: stats.inProgress },
-    { key: "resolved",    label: "Resolved",    count: stats.resolved },
+    { key: "all",         label: "All",         count: stats?.total ?? 0 },
+    { key: "pending",     label: "Pending",     count: stats?.pending ?? 0 },
+    { key: "in-progress", label: "In Progress", count: stats?.inProgress ?? 0 },
+    { key: "resolved",    label: "Resolved",    count: stats?.resolved ?? 0 },
   ];
 
   return (
@@ -148,7 +167,7 @@ function MyComplaints() {
           <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "60px 0" }}>
             <Spinner size="lg" color="var(--pastel-accent)" />
           </div>
-        ) : complaints.length === 0 ? (
+        ) : complaintList.length === 0 ? (
           <div className="mc-empty">
             <div className="mc-empty-icon">🔎</div>
             <div className="mc-empty-title">No complaints found</div>
@@ -156,7 +175,7 @@ function MyComplaints() {
           </div>
         ) : (
           <div className="mc-list">
-            {complaints.map((c) => {
+            {complaintList.map((c) => {
               const sm = STATUS_META[c.status] || { label: c.status, icon: "📋" };
               const pm = PRIORITY_META[c.priority] || { label: c.priority };
               return (

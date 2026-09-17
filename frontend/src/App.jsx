@@ -12,6 +12,7 @@ import Register from "./pages/Register";
 import ReportComplaint from "./pages/ReportComplaint";
 import MyComplaints from "./pages/MyComplaints";
 import ComplaintDetails from "./pages/ComplaintDetails";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           {/* Public routes */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/admin/login" element={<Login adminMode />} />
           <Route path="/register" element={<Register />} />
 
           {/* Protected routes — require login */}
@@ -48,6 +50,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <ComplaintDetails />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute requiredRole="admin">
+                <AdminDashboard />
               </ProtectedRoute>
             }
           />

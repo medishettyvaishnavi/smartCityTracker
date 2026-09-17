@@ -112,6 +112,7 @@ function Navbar() {
               <Link to="/report" className="nav-cta" onClick={handleLinkClick}>
                 + Report Issue
               </Link>
+              {user?.role === "admin" && <Link to="/admin" className="nav-login-btn" onClick={handleLinkClick}>Admin</Link>}
 
               {/* Avatar dropdown */}
               <div className="nav-avatar-wrap" ref={avatarRef}>
@@ -240,6 +241,7 @@ function Navbar() {
             <Link to="/report" className="nav-mobile-cta" onClick={handleLinkClick}>
               + Report Issue
             </Link>
+            {user?.role === "admin" && <Link to="/admin" className="nav-mobile-link" onClick={handleLinkClick}>Admin workspace</Link>}
             <div className="nav-mobile-divider" />
             <button className="nav-mobile-logout" onClick={handleLogout}>
               🚪 Sign Out

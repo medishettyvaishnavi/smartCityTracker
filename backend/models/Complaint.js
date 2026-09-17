@@ -68,6 +68,12 @@ const complaintSchema = new mongoose.Schema(
       required: true,
     },
 
+    assignedTo: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+
     adminNote: {
       type: String,
       trim: true,
