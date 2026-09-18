@@ -144,3 +144,33 @@ GET http://localhost:5000/api/weather
 
 ###
 GET http://localhost:5000/api/weather?city=asdfghjkl12345
+
+### Get live weather for a city (Postman: no authentication required)
+GET http://localhost:5000/api/weather?city=Hyderabad
+
+### Ask the authenticated assistant for weather (Postman: use a valid citizen token)
+POST http://localhost:5000/api/assistant/query
+Authorization: Bearer YOUR_CITIZEN_JWT_TOKEN
+Content-Type: application/json
+
+{
+  "query": "What is the weather in Hyderabad?"
+}
+
+###
+POST http://localhost:5000/api/assistant/query
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWE5MTk2MDc4NjM2YTkwMzlkMDk3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4OTY3NTE0NywiZXhwIjoxNzg5NzYxNTQ3fQ.V9lxoS9OwG-EzWXLYVP3Qdat5CcNPbaWBFe6BSS5Sqs
+Content-Type: application/json
+
+{
+  "query": "How can I report a garbage problem?"
+}
+
+###
+POST http://localhost:5000/api/assistant/query
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjZhYWE5MTk2MDc4NjM2YTkwMzlkMDk3OSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc4OTY3NTE0NywiZXhwIjoxNzg5NzYxNTQ3fQ.V9lxoS9OwG-EzWXLYVP3Qdat5CcNPbaWBFe6BSS5Sqs
+Content-Type: application/json
+
+{
+  "query": "Tell me about my road complaint"
+}

@@ -2,6 +2,7 @@ import { NavLink, Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useTheme } from "../context/ThemeContext";
+import { LANGUAGE_OPTIONS, useLanguage } from "../context/LanguageContext";
 import "./Navbar.css";
 
 /* Links shown only when logged in */
@@ -13,6 +14,7 @@ const AUTH_NAV_LINKS = [
 function Navbar() {
   const { isLoggedIn, user, logout } = useAuth();
   const { isDark, toggleTheme } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
   const location = useLocation();
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
@@ -84,6 +86,11 @@ function Navbar() {
     navigate("/");
   };
 
+  const translatedAuthNavLinks = AUTH_NAV_LINKS.map((link) => ({
+    ...link,
+    label: link.to === "/" ? t("home") : t("myComplaints"),
+  }));
+
   return (
     <nav className={`nav-root ${scrolled ? "nav-scrolled" : ""}`}>
       <div className="nav-inner">
@@ -103,7 +110,7 @@ function Navbar() {
 
         {/* ── Desktop Nav Links ──────────────────────── */}
         <div className="nav-links">
-          {isLoggedIn && AUTH_NAV_LINKS.map(({ to, label, exact }) => (
+          {isLoggedIn && translatedAuthNavLinks.map(({ to, label, exact }) => (
             <NavLink
               key={to}
               to={to}
@@ -120,7 +127,7 @@ function Navbar() {
             className={`nav-link ${isAboutActive ? "nav-link-active" : ""}`}
             onClick={handleLinkClick}
           >
-            About
+            {t("about")}
           </Link>
         </div>
 
@@ -131,16 +138,16 @@ function Navbar() {
             /* ── Logged-in state ─────────────────────── */
             <>
               <Link to="/report" className="nav-cta" onClick={handleLinkClick}>
-                + Report Issue
+                + {t("reportIssue")}
               </Link>
-              {user?.role === "admin" && <Link to="/admin" className="nav-login-btn" onClick={handleLinkClick}>Admin</Link>}
+              {user?.role === "admin" && <Link to="/admin" className="nav-login-btn" onClick={handleLinkClick}>{t("admin")}</Link>}
 
               {/* Avatar dropdown */}
               <div className="nav-avatar-wrap" ref={avatarRef}>
                 <button
                   className="nav-avatar-btn"
                   onClick={() => setAvatarOpen((v) => !v)}
-                  aria-label="Account menu"
+                  aria-label={t("accountMenu")}
                   aria-expanded={avatarOpen}
                   title={user?.name || "Account"}
                 >
@@ -158,19 +165,19 @@ function Navbar() {
                     </div>
                     <div className="nav-dropdown-divider" />
                     <div className="nav-dropdown-meta">
-                      <span>📍 {userLocation || "Location not set"}</span>
+                      <span>📍 {userLocation || t("locationNotSet")}</span>
                       {displayJoined && <span>🗓️ Joined {displayJoined}</span>}
                     </div>
                     <div className="nav-dropdown-divider" />
                     <Link to="/complaints" className="nav-dropdown-item" onClick={handleLinkClick}>
-                      📋 My Complaints
+                      📋 {t("myComplaints")}
                     </Link>
                     <Link to="/report" className="nav-dropdown-item" onClick={handleLinkClick}>
-                      📢 Report Issue
+                      📢 {t("reportIssue")}
                     </Link>
                     <div className="nav-dropdown-divider" />
                     <button className="nav-dropdown-logout" onClick={handleLogout}>
-                      🚪 Sign Out
+                      🚪 {t("logout")}
                     </button>
                   </div>
                 )}
@@ -180,10 +187,10 @@ function Navbar() {
             /* ── Logged-out state ────────────────────── */
             <>
               <Link to="/login" className="nav-login-btn" onClick={handleLinkClick}>
-                Log In
+                {t("login")}
               </Link>
               <Link to="/register" className="nav-signup-btn" onClick={handleLinkClick}>
-                Sign Up
+                {t("signUp")}
               </Link>
             </>
           )}
@@ -198,6 +205,21 @@ function Navbar() {
             <span className="nav-theme-icon">{isDark ? "☀️" : "🌙"}</span>
             <span className="nav-theme-label">{isDark ? "Light" : "Dark"}</span>
           </button>
+
+          <label className="nav-language-control" htmlFor="nav-language">
+            <span aria-hidden="true">🌐</span>
+            <span className="nav-language-label">{t("language")}</span>
+            <select
+              id="nav-language"
+              value={language}
+              onChange={(event) => setLanguage(event.target.value)}
+              aria-label={t("language")}
+            >
+              {LANGUAGE_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </label>
 
           {/* Hamburger — always visible on mobile */}
           <button
@@ -217,7 +239,7 @@ function Navbar() {
       <div className={`nav-mobile ${menuOpen ? "nav-mobile-open" : ""}`}>
         {/* Mobile Theme Toggle row */}
         <div className="nav-mobile-theme-row">
-          <span className="nav-mobile-theme-text">Appearance</span>
+          <span className="nav-mobile-theme-text">{t("appearance")}</span>
           <button
             className="nav-mobile-theme-btn"
             onClick={toggleTheme}
@@ -232,7 +254,7 @@ function Navbar() {
           className={`nav-mobile-link ${isAboutActive ? "nav-mobile-link-active" : ""}`}
           onClick={handleLinkClick}
         >
-          About
+          {t("about")}
         </Link>
 
         {isLoggedIn ? (
@@ -252,7 +274,7 @@ function Navbar() {
             </div>
             <div className="nav-mobile-divider" />
 
-            {AUTH_NAV_LINKS.map(({ to, label, exact }) => (
+            {translatedAuthNavLinks.map(({ to, label, exact }) => (
               <NavLink
                 key={to}
                 to={to}
@@ -267,22 +289,22 @@ function Navbar() {
             ))}
 
             <Link to="/report" className="nav-mobile-cta" onClick={handleLinkClick}>
-              + Report Issue
+              + {t("reportIssue")}
             </Link>
-            {user?.role === "admin" && <Link to="/admin" className="nav-mobile-link" onClick={handleLinkClick}>Admin workspace</Link>}
+            {user?.role === "admin" && <Link to="/admin" className="nav-mobile-link" onClick={handleLinkClick}>{t("adminWorkspace")}</Link>}
             <div className="nav-mobile-divider" />
             <button className="nav-mobile-logout" onClick={handleLogout}>
-              🚪 Sign Out
+              🚪 {t("logout")}
             </button>
           </>
         ) : (
           <>
             <NavLink to="/" end className={({ isActive }) => `nav-mobile-link ${isActive ? "nav-mobile-link-active" : ""}`} onClick={handleLinkClick}>
-              Home
+              {t("home")}
             </NavLink>
             <div className="nav-mobile-auth">
-              <Link to="/login" className="nav-mobile-login" onClick={handleLinkClick}>Log In</Link>
-              <Link to="/register" className="nav-mobile-signup" onClick={handleLinkClick}>Sign Up</Link>
+              <Link to="/login" className="nav-mobile-login" onClick={handleLinkClick}>{t("login")}</Link>
+              <Link to="/register" className="nav-mobile-signup" onClick={handleLinkClick}>{t("signUp")}</Link>
             </div>
           </>
         )}

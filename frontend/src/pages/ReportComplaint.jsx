@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import complaintService from "../services/complaintService";
 import { Spinner, Alert } from "../components/common";
 import "./ReportComplaint.css";
@@ -26,6 +27,7 @@ const PRIORITIES = [
 
 function ReportComplaint() {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [createdComplaint, setCreatedComplaint] = useState(null);
   const [selectedPriority, setSelectedPriority] = useState("medium");
   const [charCount, setCharCount] = useState(0);
@@ -102,7 +104,7 @@ function ReportComplaint() {
       <div className="rc-wrapper">
         <div className="rc-success-card">
           <div className="rc-success-icon">✅</div>
-          <h2>Complaint Submitted!</h2>
+          <h2>{t("submitComplaint")}!</h2>
           <p>
             Your complaint has been registered successfully on the smart city network.
             Track progress and updates under <strong>My Complaints</strong>.
@@ -112,7 +114,7 @@ function ReportComplaint() {
           </div>
           <div style={{ display: "flex", gap: "10px", justifyContent: "center", flexWrap: "wrap", marginTop: "16px" }}>
             <Link to={`/complaints/${createdComplaint.id}`} className="rc-btn rc-btn-primary">
-              View Complaint Details →
+              {t("viewDetails")} →
             </Link>
             <button className="rc-btn rc-btn-ghost" onClick={handleReset}>
               Submit Another Complaint
@@ -129,7 +131,7 @@ function ReportComplaint() {
         <div className="rc-header">
           <div className="rc-header-icon">📢</div>
           <div>
-            <h1 className="rc-title">Report a City Issue</h1>
+            <h1 className="rc-title">{t("reportComplaint")}</h1>
             <p className="rc-subtitle">
               Help us improve your city — every complaint is logged directly in MongoDB.
             </p>
@@ -150,7 +152,7 @@ function ReportComplaint() {
           <div className="rc-row">
             <div className="rc-field">
               <label className="rc-label" htmlFor="fullName">
-                Full Name <span className="rc-required">*</span>
+                {t("fullName")} <span className="rc-required">*</span>
               </label>
               <input
                 id="fullName"
@@ -206,7 +208,7 @@ function ReportComplaint() {
           {/* Complaint Title */}
           <div className="rc-field">
             <label className="rc-label" htmlFor="title">
-              Complaint Title <span className="rc-required">*</span>
+                {t("title")} <span className="rc-required">*</span>
             </label>
             <input
               id="title"
@@ -226,7 +228,7 @@ function ReportComplaint() {
           <div className="rc-row">
             <div className="rc-field" style={{ flex: 2 }}>
               <label className="rc-label" htmlFor="address">
-                Street Address / Landmark <span className="rc-required">*</span>
+                {t("location")} / Landmark <span className="rc-required">*</span>
               </label>
               <input
                 id="address"
@@ -271,7 +273,7 @@ function ReportComplaint() {
           {/* Description */}
           <div className="rc-field">
             <label className="rc-label" htmlFor="description">
-              Detailed Description <span className="rc-required">*</span>
+              {t("description")} <span className="rc-required">*</span>
             </label>
             <textarea
               id="description"
@@ -356,7 +358,7 @@ function ReportComplaint() {
           {/* Actions */}
           <div className="rc-actions">
             <button type="button" className="rc-btn rc-btn-ghost" onClick={handleReset}>
-              Clear Form
+              {t("clearForm")}
             </button>
             <button type="submit" className="rc-btn rc-btn-primary" disabled={isSubmitting}>
               {isSubmitting ? <Spinner size="sm" color="#fff" /> : "Submit Complaint"}

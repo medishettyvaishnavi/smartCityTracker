@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useLanguage } from "../context/LanguageContext";
 import WeatherCard from "../components/WeatherCard";
 import "./Home.css";
 
@@ -66,6 +67,7 @@ const STATUS_META = {
 
 function Home() {
   const { isLoggedIn, user } = useAuth();
+  const { t } = useLanguage();
   const weatherCity =
     user?.city?.trim() || user?.location?.city?.trim() || "Hyderabad";
 
@@ -78,8 +80,8 @@ function Home() {
           <div className="welcome-inner">
             <div className="welcome-left">
               <div>
-                <p className="welcome-title">Welcome back, {user?.name?.split(" ")[0]}! 👋</p>
-                <p className="welcome-sub">You're signed in as {user?.email}</p>
+                <p className="welcome-title">{t("welcomeBack")}, {user?.name?.split(" ")[0]}! 👋</p>
+                <p className="welcome-sub">{t("signedInAs")} {user?.email}</p>
               </div>
             </div>
           </div>
@@ -90,15 +92,15 @@ function Home() {
             <div className="auth-prompt-left">
               <span className="auth-prompt-icon">🔐</span>
               <div>
-                <p className="auth-prompt-title">Don't have an account yet?</p>
-                <p className="auth-prompt-sub">Register for free to report issues and track resolutions.</p>
+                <p className="auth-prompt-title">{t("noAccount")}</p>
+                <p className="auth-prompt-sub">{t("registerTrack")}</p>
               </div>
             </div>
             <div className="auth-prompt-actions">
               <Link to="/login" className="auth-login-btn">Log In</Link>
               <span className="auth-prompt-divider">or</span>
               <Link to="/register" className="auth-register-btn">
-                Create Free Account →
+                {t("createFreeAccount")} →
               </Link>
             </div>
           </div>
@@ -113,33 +115,32 @@ function Home() {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
               <path d="M3 21h18M5 21V7l5-3v17M10 21V11l5-2v12M15 21V4l5 2v15" />
             </svg>
-            Smart City Initiative
+            {t("smartCityInitiative")}
           </span>
           <h1 className="hero-title">
-            Your City,
-            <span className="hero-title-accent">Your Voice.</span>
+            {t("yourCity")}
+            <span className="hero-title-accent">{t("yourVoice")}</span>
           </h1>
           <p className="hero-desc">
-            Report public issues, track resolutions in real-time, and help
-            authorities build a better city-all in one place.
+            {t("heroDescription")}
           </p>
           <div className="hero-actions">
             {isLoggedIn ? (
               <>
                 <Link to="/report" className="hero-btn-primary">
-                  📢 Report an Issue
+                  📢 {t("reportAnIssue")}
                 </Link>
                 <Link to="/complaints" className="hero-btn-ghost">
-                  My Complaints →
+                  {t("myComplaints")} →
                 </Link>
               </>
             ) : (
               <>
                 <Link to="/login" className="hero-btn-primary">
-                  Sign In to Get Started
+                  {t("signInGetStarted")}
                 </Link>
                 <Link to="/register" className="hero-btn-ghost">
-                  Create Free Account →
+                  {t("createFreeAccount")} →
                 </Link>
               </>
             )}
@@ -186,7 +187,7 @@ function Home() {
       <section className="section" id="about">
         <div className="section-inner">
           <div className="section-header">
-            <h2 className="section-title">Everything You Need</h2>
+            <h2 className="section-title">{t("everythingYouNeed")}</h2>
             <p className="section-sub">
               A complete platform for citizens to report, track, and resolve city issues.
             </p>
@@ -209,7 +210,7 @@ function Home() {
 
           {/* How it works */}
           <div>
-            <h2 className="section-title">How It Works</h2>
+            <h2 className="section-title">{t("howItWorks")}</h2>
             <p className="section-sub" style={{ marginBottom: "2rem" }}>
               Four simple steps to get your issue resolved.
             </p>
@@ -229,7 +230,7 @@ function Home() {
 
           {/* Recent activity */}
           <div>
-            <h2 className="section-title">Recent Activity</h2>
+            <h2 className="section-title">{t("recentActivity")}</h2>
             <p className="section-sub" style={{ marginBottom: "2rem" }}>
               Latest complaints from across your city.
             </p>
@@ -256,10 +257,10 @@ function Home() {
       {/* ── CTA Banner ───────────────────────────────── */}
       <section className="cta-banner">
         <div className="cta-glow" />
-        <h2 className="cta-title">Spotted a problem in your city?</h2>
+        <h2 className="cta-title">{t("spottedProblem")}</h2>
         <p className="cta-sub">It takes less than 2 minutes to file a complaint.</p>
         <Link to="/report" className="hero-btn-primary">
-          Get Started →
+          {t("getStarted")} →
         </Link>
       </section>
 

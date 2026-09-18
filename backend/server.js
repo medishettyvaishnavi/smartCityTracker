@@ -10,6 +10,7 @@ import adminRoutes from "./routes/adminRoutes.js";
 import authMiddleware from "./middleware/authMiddleware.js";
 import adminMiddleware from "./middleware/adminMiddleware.js";
 import weatherRoutes from "./routes/weatherRoutes.js";
+import assistantRoutes from "./routes/assistantRoutes.js";
 
 const currentFile = fileURLToPath(import.meta.url);
 const currentDirectory = path.dirname(currentFile);
@@ -25,7 +26,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/complaints", complaintRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/weather", weatherRoutes);
-
+app.use("/api/assistant", assistantRoutes);
 app.get("/api/test", (req, res) => {
   res.json({
     message: "Smart City API is working",
