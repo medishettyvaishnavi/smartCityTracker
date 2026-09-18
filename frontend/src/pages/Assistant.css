@@ -17,3 +17,19 @@
   color: #b02a37;
   font-size: 0.875rem;
 }
+
+.assistant-language-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  font-size: 0.875rem;
+}
+
+.assistant-language-label select {
+  border: 1px solid #ced4da;
+  border-radius: 6px;
+  padding: 5px 9px;
+  background: #fff;
+  color: #212529;
+}

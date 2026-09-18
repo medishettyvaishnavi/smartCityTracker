@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link } from "react-router-dom";
 import complaintService from "../services/complaintService";
+import { useLanguage } from "../context/LanguageContext";
 import { Alert, Badge, Spinner } from "../components/common";
 import "./MyComplaints.css";
 
@@ -24,6 +25,7 @@ function formatDate(iso) {
 }
 
 function MyComplaints() {
+  const { t } = useLanguage();
   const [activeTab, setActiveTab] = useState("all");
   const [search, setSearch] = useState("");
   const [sortBy, setSortBy] = useState("newest");
@@ -80,10 +82,10 @@ function MyComplaints() {
     : [];
 
   const tabs = [
-    { key: "all",         label: "All",         count: stats?.total ?? 0 },
-    { key: "pending",     label: "Pending",     count: stats?.pending ?? 0 },
-    { key: "in-progress", label: "In Progress", count: stats?.inProgress ?? 0 },
-    { key: "resolved",    label: "Resolved",    count: stats?.resolved ?? 0 },
+    { key: "all",         label: t("all"),         count: stats?.total ?? 0 },
+    { key: "pending",     label: t("pending"),     count: stats?.pending ?? 0 },
+    { key: "in-progress", label: t("inProgress"), count: stats?.inProgress ?? 0 },
+    { key: "resolved",    label: t("resolved"),    count: stats?.resolved ?? 0 },
   ];
 
   return (
@@ -92,14 +94,12 @@ function MyComplaints() {
       <div className="mc-page-header">
         <div className="mc-page-header-inner">
           <div>
-            <span className="mc-badge">Citizen Portal</span>
-            <h1 className="mc-title">My Complaints</h1>
-            <p className="mc-subtitle">
-              Track the status of your reported issues in real-time.
-            </p>
+            <span className="mc-badge">{t("citizenPortal")}</span>
+            <h1 className="mc-title">{t("myComplaints")}</h1>
+            <p className="mc-subtitle">{t("trackReported")}</p>
           </div>
           <Link to="/report" className="mc-report-btn">
-            + New Complaint
+            + {t("newComplaint")}
           </Link>
         </div>
       </div>
@@ -111,22 +111,22 @@ function MyComplaints() {
           <div className="mc-summary-card mc-sum-total">
             <span className="mc-sum-icon">📋</span>
             <span className="mc-sum-val">{stats.total}</span>
-            <span className="mc-sum-lbl">Total Filed</span>
+            <span className="mc-sum-lbl">{t("totalFiled")}</span>
           </div>
           <div className="mc-summary-card mc-sum-progress">
             <span className="mc-sum-icon">🔄</span>
             <span className="mc-sum-val">{stats.inProgress}</span>
-            <span className="mc-sum-lbl">In Progress</span>
+            <span className="mc-sum-lbl">{t("inProgress")}</span>
           </div>
           <div className="mc-summary-card mc-sum-resolved">
             <span className="mc-sum-icon">✅</span>
             <span className="mc-sum-val">{stats.resolved}</span>
-            <span className="mc-sum-lbl">Resolved</span>
+            <span className="mc-sum-lbl">{t("resolved")}</span>
           </div>
           <div className="mc-summary-card mc-sum-pending">
             <span className="mc-sum-icon">⏳</span>
             <span className="mc-sum-val">{stats.pending}</span>
-            <span className="mc-sum-lbl">Pending</span>
+            <span className="mc-sum-lbl">{t("pending")}</span>
           </div>
         </div>
 
@@ -160,7 +160,7 @@ function MyComplaints() {
               <input
                 className="mc-search"
                 type="search"
-                placeholder="Search by title, category, ID…"
+                placeholder={t("searchComplaints")}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
               />
@@ -170,9 +170,9 @@ function MyComplaints() {
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
             >
-              <option value="newest">Newest First</option>
-              <option value="oldest">Oldest First</option>
-              <option value="priority">By Priority</option>
+              <option value="newest">{t("newest")}</option>
+              <option value="oldest">{t("oldest")}</option>
+              <option value="priority">{t("priority")}</option>
             </select>
           </div>
         </div>
@@ -185,8 +185,8 @@ function MyComplaints() {
         ) : complaintList.length === 0 ? (
           <div className="mc-empty">
             <div className="mc-empty-icon">🔎</div>
-            <div className="mc-empty-title">No complaints found</div>
-            <div className="mc-empty-sub">Try adjusting your search or filter.</div>
+            <div className="mc-empty-title">{t("noComplaints")}</div>
+            <div className="mc-empty-sub">{t("adjustSearch")}</div>
           </div>
         ) : (
           <div className="mc-list">
@@ -226,12 +226,12 @@ function MyComplaints() {
                       </span>
                       <div className="mc-footer-right">
                         <span className="mc-footer-item">
-                          📅 Filed: {formatDate(c.date)}
+                          📅 {t("filed")}: {formatDate(c.date)}
                         </span>
                         <span className="mc-footer-item mc-updated">
-                          🔁 Updated: {formatDate(c.updatedAt)}
+                          🔁 {t("updated")}: {formatDate(c.updatedAt)}
                         </span>
-                        <span className="mc-view-link">View Details →</span>
+                        <span className="mc-view-link">{t("viewDetails")} →</span>
                       </div>
                     </div>
                   </div>

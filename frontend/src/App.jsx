@@ -1,10 +1,12 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
-import { AuthProvider } from "./context/AuthContext";
+import { AuthProvider, useAuth } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { LanguageProvider } from "./context/LanguageContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
+import AssistantWidget from "./components/AssistantWidget";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
@@ -16,6 +18,19 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Assistant from "./pages/Assistant";
 
 function App() {
+  return (
+    <ThemeProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <AppContent />
+        </AuthProvider>
+      </LanguageProvider>
+    </ThemeProvider>
+  );
+}
+
+function AppContent() {
+  const { isLoggedIn } = useAuth();
   const routes = (
     <Routes>
       {/* Public routes */}
@@ -62,14 +77,11 @@ function App() {
   );
 
   return (
-    <ThemeProvider>
-      <AuthProvider>
-        <BrowserRouter>
-          <Navbar />
-          {routes}
-      </BrowserRouter>
-    </AuthProvider>
-  </ThemeProvider>
+    <BrowserRouter>
+      <Navbar />
+      {routes}
+      {isLoggedIn && <AssistantWidget />}
+    </BrowserRouter>
   );
 }
 

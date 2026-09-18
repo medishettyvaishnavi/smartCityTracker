@@ -1,9 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import assistantService from "../services/assistantService";
+import { cleanAssistantText } from "../services/assistantText";
+import { getAssistantLanguage } from "../services/assistantLanguages";
+import { useLanguage } from "../context/LanguageContext";
 import "./Assistant.css";
 
 function Assistant() {
   const [message, setMessage] = useState("");
+  const { language, t } = useLanguage();
   const [isListening, setIsListening] = useState(false);
   const [voiceError, setVoiceError] = useState("");
   const recognitionRef = useRef(null);
@@ -23,7 +27,7 @@ function Assistant() {
     window.speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = "en-IN";
+    utterance.lang = getAssistantLanguage(language).voice;
     utterance.rate = 1;
     utterance.pitch = 1;
 
@@ -107,26 +111,28 @@ function Assistant() {
       role: chatMessage.sender === "user" ? "user" : "assistant",
       content: chatMessage.text,
     }));
-    const data = await assistantService.query(currentMessage, history);
+    const data = await assistantService.query(currentMessage, history, language);
 
+    const cleanAnswer = cleanAssistantText(data.answer);
     const assistantMessage = {
       sender: "assistant",
-      text: data.answer,
+      text: cleanAnswer,
     };
 
     setMessages((prev) => [
       ...prev,
       assistantMessage,
     ]);
-    speakText(data.answer);
+    speakText(cleanAnswer);
   } catch (error) {
     console.error("Assistant error:", error);
 
+    const cleanError = cleanAssistantText(
+      error.response?.data?.message || "Sorry, something went wrong."
+    );
     const assistantMessage = {
       sender: "assistant",
-      text:
-        error.response?.data?.message ||
-        "Sorry, something went wrong.",
+      text: cleanError,
     };
 
     setMessages((prev) => [
@@ -142,7 +148,7 @@ function Assistant() {
 
         {/* Header */}
         <div className="card-header">
-          <h4 className="mb-0">🤖 Smart City Assistant</h4>
+          <h4 className="mb-0">{t("assistant")}</h4>
           <small>
             Ask me about complaints, weather, and city services.
           </small>
@@ -172,6 +178,7 @@ function Assistant() {
                     : "bg-light"
                 }`}
                 style={{ maxWidth: "70%" }}
+                style={{ maxWidth: "70%", whiteSpace: "pre-wrap" }}
               >
                 {msg.text}
               </div>

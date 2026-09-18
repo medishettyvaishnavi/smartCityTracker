@@ -127,6 +127,26 @@
   flex-shrink: 0;
 }
 
+.nav-language-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+
+.nav-language-control select {
+  max-width: 105px;
+  border: 1px solid var(--border-color);
+  border-radius: 7px;
+  padding: 6px 8px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font: inherit;
+  cursor: pointer;
+}
+
 /* ── Theme Toggle Button ─────────────────────────────── */
 .nav-theme-btn {
   display: inline-flex;
